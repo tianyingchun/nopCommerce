@@ -14,6 +14,7 @@ using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
 using Nop.Web.Framework.Compression;
 using Nop.Web.Framework.Infrastructure.Extensions;
+using Wangkanai.Responsive;
 
 namespace Nop.Web.Framework.Infrastructure
 {
@@ -52,7 +53,10 @@ namespace Nop.Web.Framework.Infrastructure
 
             //add theme support
             services.AddThemes();
-            
+
+            //device detection: TIANYIGNCHUN install-package Wangkanai.Responsive -pre
+            services.AddResponsive().AddViewSuffix().AddViewSubfolder();
+
             //add gif resizing support
             new PrettyGifs().Install(Config.Current);
         }
@@ -95,6 +99,10 @@ namespace Nop.Web.Framework.Infrastructure
                         ctx.Context.Response.Headers.Append(HeaderNames.CacheControl, nopConfig.StaticFilesCacheControl);
                 }
             });
+
+            //device detection: TIANYIGNCHUN install-package Wangkanai.Responsive -pre
+            application.UseResponsive();
+
             //plugins
             application.UseStaticFiles(new StaticFileOptions
             {
