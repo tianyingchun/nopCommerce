@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using FluentValidation.Attributes;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Plugin.Payments.Square.Validators;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Mvc.Models;
 
 namespace Nop.Plugin.Payments.Square.Models
 {
+    [Validator(typeof(ConfigurationModelValidator))]
     public class ConfigurationModel : BaseNopModel
     {
         #region Ctor
@@ -19,10 +22,11 @@ namespace Nop.Plugin.Payments.Square.Models
 
         #region Properties
 
-        public bool IsConfigured { get; set; }
-
         [NopResourceDisplayName("Plugins.Payments.Square.Fields.ApplicationId")]
         public string ApplicationId { get; set; }
+
+        [NopResourceDisplayName("Plugins.Payments.Square.Fields.SandboxApplicationId")]
+        public string SandboxApplicationId { get; set; }
 
         [NopResourceDisplayName("Plugins.Payments.Square.Fields.ApplicationSecret")]
         [DataType(DataType.Password)]
@@ -30,10 +34,15 @@ namespace Nop.Plugin.Payments.Square.Models
         public string ApplicationSecret { get; set; }
 
         [NopResourceDisplayName("Plugins.Payments.Square.Fields.AccessToken")]
+        [DataType(DataType.Password)]
+        [NoTrim]
         public string AccessToken { get; set; }
 
-        [NopResourceDisplayName("Plugins.Payments.Square.Fields.AccessTokenRenewalPeriod")]
-        public int AccessTokenRenewalPeriod { get; set; }
+        [NopResourceDisplayName("Plugins.Payments.Square.Fields.SandboxAccessToken")]
+        public string SandboxAccessToken { get; set; }
+
+        [NopResourceDisplayName("Plugins.Payments.Square.Fields.UseSandbox")]
+        public bool UseSandbox { get; set; }
 
         [NopResourceDisplayName("Plugins.Payments.Square.Fields.TransactionMode")]
         public int TransactionModeId { get; set; }

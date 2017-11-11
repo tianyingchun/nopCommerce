@@ -24,9 +24,14 @@ namespace Nop.Plugin.Payments.Square
         public string AccessToken { get; set; }
 
         /// <summary>
-        /// Gets or sets access token renewal period in days
+        /// Gets or sets a value indicating whether to use sandbox credentials
         /// </summary>
-        public int AccessTokenRenewalPeriod { get; set; }
+        public bool UseSandbox { get; set; }
+
+        /// <summary>
+        /// Gets or sets access token verification string
+        /// </summary>
+        public string AccessTokenVerificationString { get; set; }
 
         /// <summary>
         /// Gets or sets the transaction mode

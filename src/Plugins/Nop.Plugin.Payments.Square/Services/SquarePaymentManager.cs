@@ -58,6 +58,15 @@ namespace Nop.Plugin.Payments.Square.Services
         /// <returns>The API Configuration</returns>
         private Configuration CreateApiConfiguration()
         {
+            //validate access token
+            if (_squarePaymentSettings.UseSandbox && 
+                (string.IsNullOrEmpty(_squarePaymentSettings.AccessToken) || 
+                    !_squarePaymentSettings.AccessToken.StartsWith(SquarePaymentDefaults.SandboxCredentialsPrefix, StringComparison.InvariantCultureIgnoreCase)))
+
+            {
+                throw new NopException($"Sandbox access token should start with '{SquarePaymentDefaults.SandboxCredentialsPrefix}'");
+            }
+
             return new Configuration
             {
                 AccessToken = _squarePaymentSettings.AccessToken,
@@ -95,8 +104,9 @@ namespace Nop.Plugin.Payments.Square.Services
                     throw new NopException($"There are errors in the service response. {errorsMessage}");
                 }
 
-                //filter active locations
-                var activeLocations = listLocationsResponse.Locations?.Where(location => location?.Status == Location.StatusEnum.ACTIVE).ToList();
+                //filter active locations and locations that can process credit cards
+                var activeLocations = listLocationsResponse.Locations?.Where(location => location?.Status == Location.StatusEnum.ACTIVE
+                    && (location.Capabilities?.Contains(Location.CapabilitiesEnum.PROCESSING) ?? false)).ToList();
                 if (!activeLocations?.Any() ?? true)
                     throw new NopException("There are no active locations for the account");
 
@@ -104,59 +114,10 @@ namespace Nop.Plugin.Payments.Square.Services
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
-                if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
-
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
+                //log full error
+                _logger.Error($"Square payment error: {exception.Message}.", exception, _workContext.CurrentCustomer);
 
                 return new List<Location>();
-            }
-        }
-
-        /// <summary>
-        /// Get transaction by transaction identifier
-        /// </summary>
-        /// <param name="transactionId">Transaction ID</param>
-        /// <returns>Transaction</returns>
-        public Transaction GetTransaction(string transactionId)
-        {
-            try
-            {
-                //try to get the selected location
-                var selectedLocation = GetActiveLocations().FirstOrDefault(location => location.Id.Equals(_squarePaymentSettings.LocationId));
-                if (selectedLocation == null)
-                    throw new NopException("Location is a required parameter for payment requests");
-
-                //create transaction API
-                var configuration = CreateApiConfiguration();
-                var transactionsApi = new TransactionsApi(configuration);
-
-                //get transaction by identifier
-                var retrieveTransactionResponse = transactionsApi.RetrieveTransaction(selectedLocation.Id, transactionId);
-                if (retrieveTransactionResponse == null)
-                    throw new NopException("No service response");
-
-                //check whether there are errors in the service response
-                if (retrieveTransactionResponse.Errors?.Any() ?? false)
-                {
-                    var errorsMessage = string.Join(";", retrieveTransactionResponse.Errors.Select(error => error.ToString()));
-                    throw new NopException($"There are errors in the service response. {errorsMessage}");
-                }
-
-                return retrieveTransactionResponse.Transaction;
-            }
-            catch (Exception exception)
-            {
-                var errorMessage = $"Square payment error: {exception.Message}.";
-                if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
-
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
-
-                return null;
             }
         }
 
@@ -193,12 +154,8 @@ namespace Nop.Plugin.Payments.Square.Services
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
-                if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
-
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
+                //log full error
+                _logger.Error($"Square payment error: {exception.Message}.", exception, _workContext.CurrentCustomer);
 
                 return null;
             }
@@ -233,12 +190,8 @@ namespace Nop.Plugin.Payments.Square.Services
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
-                if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
-
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
+                //log full error
+                _logger.Error($"Square payment error: {exception.Message}.", exception, _workContext.CurrentCustomer);
 
                 return null;
             }
@@ -274,12 +227,8 @@ namespace Nop.Plugin.Payments.Square.Services
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
-                if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
-
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
+                //log full error
+                _logger.Error($"Square payment error: {exception.Message}.", exception, _workContext.CurrentCustomer);
 
                 return null;
             }
@@ -290,11 +239,61 @@ namespace Nop.Plugin.Payments.Square.Services
         #region Payment workflow
 
         /// <summary>
+        /// Get transaction by transaction identifier
+        /// </summary>
+        /// <param name="transactionId">Transaction ID</param>
+        /// <returns>Transaction and/or errors if exist</returns>
+        public (Transaction, string) GetTransaction(string transactionId)
+        {
+            try
+            {
+                //try to get the selected location
+                var selectedLocation = GetActiveLocations().FirstOrDefault(location => location.Id.Equals(_squarePaymentSettings.LocationId));
+                if (selectedLocation == null)
+                    throw new NopException("Location is a required parameter for payment requests");
+
+                //create transaction API
+                var configuration = CreateApiConfiguration();
+                var transactionsApi = new TransactionsApi(configuration);
+
+                //get transaction by identifier
+                var retrieveTransactionResponse = transactionsApi.RetrieveTransaction(selectedLocation.Id, transactionId);
+                if (retrieveTransactionResponse == null)
+                    throw new NopException("No service response");
+
+                //check whether there are errors in the service response
+                if (retrieveTransactionResponse.Errors?.Any() ?? false)
+                {
+                    var errorsMessage = string.Join(";", retrieveTransactionResponse.Errors.Select(error => error.ToString()));
+                    throw new NopException($"There are errors in the service response. {errorsMessage}");
+                }
+
+                return (retrieveTransactionResponse.Transaction, null);
+            }
+            catch (Exception exception)
+            {
+                //log full error
+                var errorMessage = exception.Message;
+                _logger.Error($"Square payment error: {errorMessage}.", exception, _workContext.CurrentCustomer);
+
+                if (exception is ApiException apiException)
+                {
+                    //try to get error details
+                    var response = JsonConvert.DeserializeObject<RetrieveTransactionResponse>(apiException.ErrorContent) as RetrieveTransactionResponse;
+                    if (response?.Errors?.Any() ?? false)
+                        errorMessage = string.Join(";", response.Errors.Select(error => error.Detail));
+                }
+
+                return (null, errorMessage);
+            }
+        }
+
+        /// <summary>
         /// Charge transaction
         /// </summary>
         /// <param name="chargeRequest">Request parameters to charge transaction</param>
-        /// <returns>Transaction</returns>
-        public Transaction Charge(ChargeRequest chargeRequest)
+        /// <returns>Transaction and/or errors if exist</returns>
+        public (Transaction, string) Charge(ExtendedChargeRequest chargeRequest)
         {
             try
             {
@@ -319,18 +318,23 @@ namespace Nop.Plugin.Payments.Square.Services
                     throw new NopException($"There are errors in the service response. {errorsMessage}");
                 }
 
-                return chargeResponse.Transaction;
+                return (chargeResponse.Transaction, null);
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
+                //log full error
+                var errorMessage = exception.Message;
+                _logger.Error($"Square payment error: {errorMessage}.", exception, _workContext.CurrentCustomer);
+
                 if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
+                {
+                    //try to get error details
+                    var response = JsonConvert.DeserializeObject<ChargeResponse>(apiException.ErrorContent) as ChargeResponse;
+                    if (response?.Errors?.Any() ?? false)
+                        errorMessage = string.Join(";", response.Errors.Select(error => error.Detail));
+                }
 
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
-
-                return null;
+                return (null, errorMessage);
             }
         }
 
@@ -338,8 +342,8 @@ namespace Nop.Plugin.Payments.Square.Services
         /// Capture authorized transaction
         /// </summary>
         /// <param name="transactionId">Transaction ID</param>
-        /// <returns>True if the transaction successfully captured; otherwise false</returns>
-        public bool CaptureTransaction(string transactionId)
+        /// <returns>True if the transaction successfully captured; otherwise false. And/or errors if exist</returns>
+        public (bool, string) CaptureTransaction(string transactionId)
         {
             try
             {
@@ -365,18 +369,23 @@ namespace Nop.Plugin.Payments.Square.Services
                 }
 
                 //if there are no errors in the response, transaction was successfully captured
-                return true;
+                return (true, null);
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
+                //log full error
+                var errorMessage = exception.Message;
+                _logger.Error($"Square payment error: {errorMessage}.", exception, _workContext.CurrentCustomer);
+
                 if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
+                {
+                    //try to get error details
+                    var response = JsonConvert.DeserializeObject<CaptureTransactionResponse>(apiException.ErrorContent) as CaptureTransactionResponse;
+                    if (response?.Errors?.Any() ?? false)
+                        errorMessage = string.Join(";", response.Errors.Select(error => error.Detail));
+                }
 
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
-
-                return false;
+                return (false, errorMessage);
             }
         }
 
@@ -384,8 +393,8 @@ namespace Nop.Plugin.Payments.Square.Services
         /// Void authorized transaction
         /// </summary>
         /// <param name="transactionId">Transaction ID</param>
-        /// <returns>True if the transaction successfully voided; otherwise false</returns>
-        public bool VoidTransaction(string transactionId)
+        /// <returns>True if the transaction successfully voided; otherwise false. And/or errors if exist</returns>
+        public (bool, string) VoidTransaction(string transactionId)
         {
             try
             {
@@ -411,18 +420,23 @@ namespace Nop.Plugin.Payments.Square.Services
                 }
 
                 //if there are no errors in the response, transaction was successfully voided
-                return true;
+                return (true, null);
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
+                //log full error
+                var errorMessage = exception.Message;
+                _logger.Error($"Square payment error: {errorMessage}.", exception, _workContext.CurrentCustomer);
+
                 if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
+                {
+                    //try to get error details
+                    var response = JsonConvert.DeserializeObject<VoidTransactionResponse>(apiException.ErrorContent) as VoidTransactionResponse;
+                    if (response?.Errors?.Any() ?? false)
+                        errorMessage = string.Join(";", response.Errors.Select(error => error.Detail));
+                }
 
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
-
-                return false;
+                return (false, errorMessage);
             }
         }
 
@@ -431,8 +445,8 @@ namespace Nop.Plugin.Payments.Square.Services
         /// </summary>
         /// <param name="transactionId">Transaction ID</param>
         /// <param name="refundRequest">Request parameters to create refund</param>
-        /// <returns>Refund</returns>
-        public Refund CreateRefund(string transactionId, CreateRefundRequest refundRequest)
+        /// <returns>Refund and/or errors if exist</returns>
+        public (Refund, string) CreateRefund(string transactionId, CreateRefundRequest refundRequest)
         {
             try
             {
@@ -457,18 +471,23 @@ namespace Nop.Plugin.Payments.Square.Services
                     throw new NopException($"There are errors in the service response. {errorsMessage}");
                 }
 
-                return createRefundResponse.Refund;
+                return (createRefundResponse.Refund, null);
             }
             catch (Exception exception)
             {
-                var errorMessage = $"Square payment error: {exception.Message}.";
+                //log full error
+                var errorMessage = exception.Message;
+                _logger.Error($"Square payment error: {errorMessage}.", exception, _workContext.CurrentCustomer);
+
                 if (exception is ApiException apiException)
-                    errorMessage = $"{errorMessage} Details: {apiException.ErrorCode} - {apiException.ErrorContent}";
+                {
+                    //try to get error details
+                    var response = JsonConvert.DeserializeObject<CreateRefundResponse>(apiException.ErrorContent) as CreateRefundResponse;
+                    if (response?.Errors?.Any() ?? false)
+                        errorMessage = string.Join(";", response.Errors.Select(error => error.Detail));
+                }
 
-                //log errors
-                _logger.Error(errorMessage, exception, _workContext.CurrentCustomer);
-
-                return null;
+                return (null, errorMessage);
             }
         }
 
@@ -479,8 +498,9 @@ namespace Nop.Plugin.Payments.Square.Services
         /// <summary>
         /// Generate URL for the authorization permissions page
         /// </summary>
+        /// <param name="verificationString">String to help protect against cross-site request forgery</param>
         /// <returns>URL</returns>
-        public string GenerateAuthorizeUrl()
+        public string GenerateAuthorizeUrl(string verificationString)
         {
             var serviceUrl = $"{GetOAuthServiceUrl()}/authorize";
 
@@ -552,10 +572,10 @@ namespace Nop.Plugin.Payments.Square.Services
                 //["locale"] = string.Empty,
 
                 //If "false", the Square merchant must log in to view the Permission Request form, even if they already have a valid user session.
-                ["session"] = "true",
+                ["session"] = "false",
 
                 //Include this parameter and verify its value to help protect against cross-site request forgery.
-                //["state"] = string.Empty,
+                ["state"] = verificationString,
 
                 //The ID of the subscription plan to direct the merchant to sign up for, if any.
                 //You can provide this parameter with no value to give a merchant the option to cancel an active subscription.
@@ -636,6 +656,44 @@ namespace Nop.Plugin.Payments.Square.Services
                 //return received access token
                 var response = JsonConvert.DeserializeObject<RenewAccessTokenResponse>(streamReader.ReadToEnd());
                 return response?.AccessToken;
+            }
+        }
+
+        /// <summary>
+        /// Revoke all access tokens
+        /// </summary>
+        /// <param name="revokeTokenRequest">Request parameters to revoke access token</param>
+        /// <returns>True if tokens were successfully revoked; otherwise false</returns>
+        public bool RevokeAccessTokens(RevokeAccessTokenRequest revokeTokenRequest)
+        {
+            //create post data
+            var postData = Encoding.Default.GetBytes(JsonConvert.SerializeObject(revokeTokenRequest));
+
+            //create web request
+            var serviceUrl = $"{GetOAuthServiceUrl()}/revoke";
+            var request = (HttpWebRequest)WebRequest.Create(serviceUrl);
+            request.Method = WebRequestMethods.Http.Post;
+            request.Accept = "application/json";
+            request.ContentType = "application/json";
+            request.ContentLength = postData.Length;
+            request.UserAgent = SquarePaymentDefaults.UserAgent;
+
+            //add authorization header
+            request.Headers.Add(HttpRequestHeader.Authorization, $"Client {revokeTokenRequest.ApplicationSecret}");
+
+            //post request
+            using (var stream = request.GetRequestStream())
+            {
+                stream.Write(postData, 0, postData.Length);
+            }
+
+            //get response
+            var httpResponse = (HttpWebResponse)request.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                //return received value
+                var response = JsonConvert.DeserializeObject<RevokeAccessTokenResponse>(streamReader.ReadToEnd());
+                return response?.SuccessfullyRevoked ?? false;
             }
         }
 
