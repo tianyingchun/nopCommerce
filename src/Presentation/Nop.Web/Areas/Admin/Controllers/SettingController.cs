@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Nop.Web.Areas.Admin.Extensions;
-using Nop.Web.Areas.Admin.Models.Common;
-using Nop.Web.Areas.Admin.Models.Settings;
 using Nop.Core;
 using Nop.Core.Configuration;
 using Nop.Core.Domain;
@@ -37,16 +34,18 @@ using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Tax;
+using Nop.Services.Themes;
+using Nop.Web.Areas.Admin.Extensions;
+using Nop.Web.Areas.Admin.Models.Common;
+using Nop.Web.Areas.Admin.Models.Settings;
+using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Kendoui;
 using Nop.Web.Framework.Localization;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
-using Nop.Web.Framework.Security;
 using Nop.Web.Framework.Security.Captcha;
-using Nop.Web.Framework.Themes;
-using Nop.Web.Framework;
 
 namespace Nop.Web.Areas.Admin.Controllers
 {
@@ -1592,9 +1591,11 @@ namespace Nop.Web.Areas.Admin.Controllers
             var externalAuthenticationSettings = _settingService.LoadSetting<ExternalAuthenticationSettings>(storeScope);
 
             //merge settings
-            var model = new CustomerUserSettingsModel();
-            model.CustomerSettings = customerSettings.ToModel();
-            model.AddressSettings = addressSettings.ToModel();
+            var model = new CustomerUserSettingsModel
+            {
+                CustomerSettings = customerSettings.ToModel(),
+                AddressSettings = addressSettings.ToModel()
+            };
 
             model.DateTimeSettings.AllowCustomersToSetTimeZone = dateTimeSettings.AllowCustomersToSetTimeZone;
             model.DateTimeSettings.DefaultStoreTimeZoneId = _dateTimeHelper.DefaultStoreTimeZone.Id;
@@ -1664,9 +1665,9 @@ namespace Nop.Web.Areas.Admin.Controllers
             model.StoreInformationSettings.StoreClosed = storeInformationSettings.StoreClosed;
             //themes
             model.StoreInformationSettings.DefaultStoreTheme = storeInformationSettings.DefaultStoreTheme;
-            model.StoreInformationSettings.AvailableStoreThemes = _themeProvider.GetThemeConfigurations().Select(x => new GeneralCommonSettingsModel.StoreInformationSettingsModel.ThemeConfigurationModel
+            model.StoreInformationSettings.AvailableStoreThemes = _themeProvider.GetThemes().Select(x => new GeneralCommonSettingsModel.StoreInformationSettingsModel.ThemeModel
             {
-                Title = x.Title,
+                FriendlyName = x.FriendlyName,
                 SystemName = x.SystemName,
                 PreviewImageUrl = x.PreviewImageUrl,
                 PreviewText = x.PreviewText,
@@ -1753,7 +1754,11 @@ namespace Nop.Web.Areas.Admin.Controllers
                 model.SeoSettings.OpenGraphMetaTags_OverrideForStore = _settingService.SettingExists(seoSettings, x => x.OpenGraphMetaTags, storeScope);
                 model.SeoSettings.CustomHeadTags_OverrideForStore = _settingService.SettingExists(seoSettings, x => x.CustomHeadTags, storeScope);
             }
-            
+
+            //notify admin that CSS bundling is not allowed in virtual directories
+            if (seoSettings.EnableCssBundling && this.HttpContext.Request.PathBase.HasValue)
+                WarningNotification(_localizationService.GetResource("Admin.Configuration.Settings.GeneralCommon.EnableCssBundling.Warning"), false);
+
             //security settings
             var securitySettings = _settingService.LoadSetting<SecuritySettings>(storeScope);
             model.SecuritySettings.EncryptionKey = securitySettings.EncryptionKey;
@@ -2328,7 +2333,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         }
 
         //action displaying notification (warning) to a store owner about a lot of traffic 
-        //between the Redis server and the application when LoadAllLocaleRecordsOnStartup seetting is set
+        //between the Redis server and the application when LoadAllLocaleRecordsOnStartup setting is set
         public IActionResult RedisCacheHighTrafficWarning(bool loadAllLocaleRecordsOnStartup)
         {
             //LoadAllLocaleRecordsOnStartup is set and Redis cache is used, so display warning

@@ -46,7 +46,7 @@ namespace Nop.Plugin.Payments.Worldpay.Services
         /// <returns>URL</returns>
         private string GetServiceUrl()
         {
-            return _worldpayPaymentSettings.UseSandbox ? "https://gwapi.demo.securenet.com" : " https://gwapi.securenet.com";
+            return _worldpayPaymentSettings.UseSandbox ? "https://gwapi.demo.securenet.com" : "https://gwapi.securenet.com";
         }
 
         /// <summary>
@@ -56,12 +56,12 @@ namespace Nop.Plugin.Payments.Worldpay.Services
         /// <param name="request">Request</param>
         private void SetDeveloperCredentials<TRequest>(TRequest request) where TRequest : WorldpayPostRequest
         {
-            if (int.TryParse(_worldpayPaymentSettings.DeveloperId, out int developerId))
+            if (int.TryParse(_worldpayPaymentSettings.UseSandbox ? WorldpayPaymentDefaults.SandboxDeveloperId : WorldpayPaymentDefaults.DeveloperId, out int developerId))
             {
                 request.DeveloperApplication = new DeveloperApplication
                 {
                     DeveloperId = developerId,
-                    DeveloperVersion = _worldpayPaymentSettings.DeveloperVersion
+                    DeveloperVersion = _worldpayPaymentSettings.UseSandbox ? WorldpayPaymentDefaults.SandboxDeveloperVersion : WorldpayPaymentDefaults.DeveloperVersion
                 };
             }
         }
@@ -175,6 +175,9 @@ namespace Nop.Plugin.Payments.Worldpay.Services
         /// <returns>Vault customer</returns>
         public VaultCustomer GetCustomer(string customerId)
         {
+            if (string.IsNullOrEmpty(customerId))
+                return null;
+
             var request = new GetCustomerRequest { CustomerId = customerId };
             var response = ProcessRequest<GetCustomerRequest, GetCustomerResponse>(request);
             if (response != null && response.Code == ResponseCode.Approved)
@@ -189,7 +192,7 @@ namespace Nop.Plugin.Payments.Worldpay.Services
             else
             {
                 //log errors
-                _logger.Error($"The request was {response.Code} for a reason '{response.Result}'. {response.Message}", customer: _workContext.CurrentCustomer);
+                _logger.Error($"The request was {response?.Code} for a reason '{response?.Result}'. {response?.Message}", customer: _workContext.CurrentCustomer);
             }
 
             return null;
@@ -211,9 +214,51 @@ namespace Nop.Plugin.Payments.Worldpay.Services
                 return response.Customer;
 
             //log errors
+            _logger.Error($"The request was {response?.Code} for a reason '{response?.Result}'. {response?.Message}", customer: _workContext.CurrentCustomer);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Update a customer in the Vault
+        /// </summary>
+        /// <param name="request">Request parameters to update a customer</param>
+        /// <returns>Vault customer</returns>
+        public VaultCustomer UpdateCustomer(UpdateCustomerRequest request)
+        {
+            //set developer credentials
+            SetDeveloperCredentials(request);
+
+            //try to update a customer
+            var response = ProcessRequest<UpdateCustomerRequest, UpdateCustomerResponse>(request);
+            if (response != null && response.Code == ResponseCode.Approved)
+                return response.Customer;
+
+            //log errors
             _logger.Error($"The request was {response.Code} for a reason '{response.Result}'. {response.Message}", customer: _workContext.CurrentCustomer);
 
             return null;
+        }
+
+        /// <summary>
+        /// Delete a customer credit card from the Vault
+        /// </summary>
+        /// <param name="request">Request parameters to delete a card</param>
+        /// <returns>True if a card is successfully deleted; otherwise false</returns>
+        public bool Deletecard(DeleteCardRequest request)
+        {
+            //set developer credentials
+            SetDeveloperCredentials(request);
+
+            //try to delete a card
+            var response = ProcessRequest<DeleteCardRequest, DeleteCardResponse>(request);
+            if (response != null && response.Code == ResponseCode.Approved)
+                return true;
+
+            //log errors
+            _logger.Error($"The request was {response.Code} for a reason '{response.Result}'. {response.Message}", customer: _workContext.CurrentCustomer);
+
+            return false;
         }
 
         /// <summary>

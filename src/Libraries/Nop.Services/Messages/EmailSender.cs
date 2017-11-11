@@ -16,6 +16,10 @@ namespace Nop.Services.Messages
     {
         private readonly IDownloadService _downloadService;
 
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="downloadService">Download service</param>
         public EmailSender(IDownloadService downloadService)
         {
             this._downloadService = downloadService;
@@ -46,9 +50,11 @@ namespace Nop.Services.Messages
             string attachmentFilePath = null, string attachmentFileName = null,
             int attachedDownloadId = 0, IDictionary<string, string> headers = null)
         {
-            var message = new MailMessage();
-            //from, to, reply to
-            message.From = new MailAddress(fromAddress, fromName);
+            var message = new MailMessage
+            {
+                //from, to, reply to
+                From = new MailAddress(fromAddress, fromName)
+            };
             message.To.Add(new MailAddress(toAddress, toName));
             if (!string.IsNullOrEmpty(replyTo))
             {

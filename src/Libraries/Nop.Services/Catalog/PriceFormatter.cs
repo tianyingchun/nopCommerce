@@ -27,6 +27,14 @@ namespace Nop.Services.Catalog
 
         #region Ctor
 
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="workContext">Work context</param>
+        /// <param name="currencyService">Currency service</param>
+        /// <param name="localizationService">Localization service</param>
+        /// <param name="taxSettings">Tax settings</param>
+        /// <param name="currencySettings">Currency settings</param>
         public PriceFormatter(IWorkContext workContext,
             ICurrencyService currencyService,
             ILocalizationService localizationService,
@@ -150,8 +158,10 @@ namespace Nop.Services.Catalog
             var currency = _currencyService.GetCurrencyByCode(currencyCode);
             if (currency == null)
             {
-                currency = new Currency();
-                currency.CurrencyCode = currencyCode;
+                currency = new Currency
+                {
+                    CurrencyCode = currencyCode
+                };
             }
             var priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
             return FormatPrice(price, showCurrency, currency, language, priceIncludesTax, showTax);

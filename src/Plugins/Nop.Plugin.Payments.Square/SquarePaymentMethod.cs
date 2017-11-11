@@ -22,6 +22,7 @@ using Nop.Services.Logging;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Tasks;
+using Nop.Web.Framework.UI;
 using SquareModel = Square.Connect.Model;
 
 namespace Nop.Plugin.Payments.Square
@@ -40,6 +41,7 @@ namespace Nop.Plugin.Payments.Square
         private readonly ILocalizationService _localizationService;
         private readonly ILogger _logger;
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly IPageHeadBuilder _pageHeadBuilder;
         private readonly ISettingService _settingService;
         private readonly IScheduleTaskService _scheduleTaskService;
         private readonly IWebHelper _webHelper;
@@ -57,6 +59,7 @@ namespace Nop.Plugin.Payments.Square
             ILocalizationService localizationService,
             ILogger logger,
             IOrderTotalCalculationService orderTotalCalculationService,
+            IPageHeadBuilder pageHeadBuilder,
             ISettingService settingService,
             IScheduleTaskService scheduleTaskService,
             IWebHelper webHelper,
@@ -70,6 +73,7 @@ namespace Nop.Plugin.Payments.Square
             this._localizationService = localizationService;
             this._logger = logger;
             this._orderTotalCalculationService = orderTotalCalculationService;
+            this._pageHeadBuilder = pageHeadBuilder;
             this._settingService = settingService;
             this._scheduleTaskService = scheduleTaskService;
             this._webHelper = webHelper;
@@ -119,9 +123,9 @@ namespace Nop.Plugin.Payments.Square
             var chargeRequest = CreateChargeRequest(paymentRequest, isRecurringPayment);
 
             //charge transaction
-            var transaction = _squarePaymentManager.Charge(chargeRequest);
+            var (transaction, error) = _squarePaymentManager.Charge(chargeRequest);
             if (transaction == null)
-                throw new NopException("Failed to retrieve transaction. Error details in the log");
+                throw new NopException(error);
 
             //get transaction tender
             var tender = transaction.Tenders?.FirstOrDefault();
@@ -159,7 +163,7 @@ namespace Nop.Plugin.Payments.Square
         /// <param name="paymentRequest">Payment request parameters</param>
         /// <param name="isRecurringPayment">Whether it is a recurring payment</param>
         /// <returns>Charge request parameters</returns>
-        private SquareModel.ChargeRequest CreateChargeRequest(ProcessPaymentRequest paymentRequest, bool isRecurringPayment)
+        private ExtendedChargeRequest CreateChargeRequest(ProcessPaymentRequest paymentRequest, bool isRecurringPayment)
         {
             //get customer
             var customer = _customerService.GetCustomerById(paymentRequest.CustomerId);
@@ -202,13 +206,15 @@ namespace Nop.Plugin.Payments.Square
             var amountMoney = new SquareModel.Money(Amount: orderTotal, Currency: moneyCurrency);
 
             //create common charge request parameters
-            var chargeRequest = new SquareModel.ChargeRequest
+            var chargeRequest = new ExtendedChargeRequest
             (
                 AmountMoney: amountMoney,
                 BillingAddress: billingAddress,
                 BuyerEmailAddress: email,
                 DelayCapture: _squarePaymentSettings.TransactionMode == TransactionMode.Authorize,
                 IdempotencyKey: Guid.NewGuid().ToString(),
+                IntegrationId: !string.IsNullOrEmpty(SquarePaymentDefaults.IntegrationId) ? SquarePaymentDefaults.IntegrationId : null,
+                Note: string.Format(SquarePaymentDefaults.PaymentNote, paymentRequest.OrderGuid),
                 ReferenceId: paymentRequest.OrderGuid.ToString(),
                 ShippingAddress: shippingAddress
             );
@@ -382,9 +388,9 @@ namespace Nop.Plugin.Payments.Square
 
             //capture transaction
             var transactionId = capturePaymentRequest.Order.AuthorizationTransactionId;
-            var successfullyCaptured = _squarePaymentManager.CaptureTransaction(transactionId);
+            var (successfullyCaptured, error) = _squarePaymentManager.CaptureTransaction(transactionId);
             if (!successfullyCaptured)
-                throw new NopException("An error occurred while processing. Error details in the log");
+                throw new NopException(error);
 
             //successfully captured
             return new CapturePaymentResult
@@ -420,9 +426,9 @@ namespace Nop.Plugin.Payments.Square
 
             //first try to get the transaction
             var transactionId = refundPaymentRequest.Order.CaptureTransactionId;
-            var transaction = _squarePaymentManager.GetTransaction(transactionId);
+            var (transaction, transactionError) = _squarePaymentManager.GetTransaction(transactionId);
             if (transaction == null)
-                throw new NopException("Failed to retrieve transaction. Error details in the log");
+                throw new NopException(transactionError);
 
             //get tender
             var tender = transaction.Tenders?.FirstOrDefault();
@@ -436,21 +442,27 @@ namespace Nop.Plugin.Payments.Square
                 IdempotencyKey: Guid.NewGuid().ToString(),
                 TenderId: tender.Id
             );
-            var createdRefund = _squarePaymentManager.CreateRefund(transactionId, refundRequest);
+            var (createdRefund, refundError) = _squarePaymentManager.CreateRefund(transactionId, refundRequest);
             if (createdRefund == null)
-                throw new NopException("Failed to create refund. Error details in the log");
+                throw new NopException(refundError);
 
             //if refund status is 'pending', try to refund once more with the same request parameters
             if (createdRefund.Status == SquareModel.Refund.StatusEnum.PENDING)
             {
-                createdRefund = _squarePaymentManager.CreateRefund(transactionId, refundRequest);
+                (createdRefund, refundError) = _squarePaymentManager.CreateRefund(transactionId, refundRequest);
                 if (createdRefund == null)
-                    throw new NopException("Failed to create refund. Error details in the log");
+                    throw new NopException(refundError);
             }
 
             //check whether refund is approved
             if (createdRefund.Status != SquareModel.Refund.StatusEnum.APPROVED)
-                throw new NopException($"Refund is {createdRefund.Status}");
+            {
+                //change error notification to warning one (for the pending status)
+                if (createdRefund.Status == SquareModel.Refund.StatusEnum.PENDING)
+                    _pageHeadBuilder.AddCssFileParts(ResourceLocation.Head, @"~/Plugins/Payments.Square/Content/styles.css", null);
+
+                return new RefundPaymentResult { Errors = new[] { $"Refund is {createdRefund.Status}" }.ToList() };
+            }
 
             //successfully refunded
             return new RefundPaymentResult
@@ -471,9 +483,9 @@ namespace Nop.Plugin.Payments.Square
 
             //void transaction
             var transactionId = voidPaymentRequest.Order.AuthorizationTransactionId;
-            var successfullyVoided = _squarePaymentManager.VoidTransaction(transactionId);
+            var (successfullyVoided, error) = _squarePaymentManager.VoidTransaction(transactionId);
             if (!successfullyVoided)
-                throw new NopException("An error occurred while processing. Error details in the log");
+                throw new NopException(error);
 
             //successfully voided
             return new VoidPaymentResult
@@ -585,13 +597,12 @@ namespace Nop.Plugin.Payments.Square
         public override void Install()
         {
             //settings
-            var settings = new SquarePaymentSettings
+            _settingService.SaveSetting(new SquarePaymentSettings
             {
                 LocationId = "0",
                 TransactionMode = TransactionMode.Charge,
-                AccessTokenRenewalPeriod = 30
-            };
-            _settingService.SaveSetting(settings);
+                UseSandbox = true
+            });
 
             //install renew access token schedule task
             if (_scheduleTaskService.GetTaskByType(SquarePaymentDefaults.RenewAccessTokenTask) == null)
@@ -599,7 +610,7 @@ namespace Nop.Plugin.Payments.Square
                 _scheduleTaskService.InsertTask(new ScheduleTask
                 {
                     Enabled = true,
-                    Seconds = settings.AccessTokenRenewalPeriod * 24 * 60 * 60,
+                    Seconds = SquarePaymentDefaults.AccessTokenRenewalPeriodRecommended * 24 * 60 * 60,
                     Name = SquarePaymentDefaults.RenewAccessTokenTaskName,
                     Type = SquarePaymentDefaults.RenewAccessTokenTask,
                 });
@@ -608,10 +619,9 @@ namespace Nop.Plugin.Payments.Square
             //locales
             this.AddOrUpdatePluginLocaleResource("Enums.Nop.Plugin.Payments.Square.Domain.TransactionMode.Authorize", "Authorize only");
             this.AddOrUpdatePluginLocaleResource("Enums.Nop.Plugin.Payments.Square.Domain.TransactionMode.Charge", "Charge (authorize and capture)");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.AccessTokenRenewalPeriod.Error", "Token renewal limit to {0} days max, but it is recommended that you specify {1} days for the period");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AccessToken", "Access token");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AccessToken.Hint", "Specify the personal access token, available from the application dashboard. You can also use the automatically renewed OAuth access tokens, that you can get by pressing button 'Obtain access token'");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AccessTokenRenewalPeriod", "Access token renewal period (days)");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AccessTokenRenewalPeriod.Hint", "Access tokens besides your personal access token expire after thirty days, so it is recommended that you specify 30 days for the period. Specify 0 if you use the personal access token.");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AccessToken.Hint", "Get the automatically renewed OAuth access token by pressing button 'Obtain access token'.");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AdditionalFee", "Additional fee");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AdditionalFee.Hint", "Enter additional fee to charge your customers.");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.AdditionalFeePercentage", "Additional fee. Use percentage");
@@ -622,10 +632,14 @@ namespace Nop.Plugin.Payments.Square
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.ApplicationSecret.Hint", "Enter your application secret, available from the application dashboard.");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.CardNonce.Key", "Pay using card nonce");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.Location", "Business location");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.Location.Hint", "Choose your business locations. Location is a required parameter for payment requests.");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.Location.Hint", "Choose your business location. Location is a required parameter for payment requests.");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.Location.NotExist", "No locations");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.PostalCode", "Postal code");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.PostalCode.Key", "Postal code");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxAccessToken", "Sandbox access token");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxAccessToken.Hint", "Enter your sandbox access token, available from the application dashboard.");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxApplicationId", "Sandbox application ID");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxApplicationId.Hint", "Enter your sandbox application ID, available from the application dashboard.");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.SaveCard", "Save the card data for future purchasing");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.SaveCard.Key", "Save card details");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.StoredCard", "Use a previously saved card");
@@ -634,18 +648,22 @@ namespace Nop.Plugin.Payments.Square
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.StoredCard.SelectCard", "Select a card");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.TransactionMode", "Transaction mode");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.TransactionMode.Hint", "Choose the transaction mode.");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.UseSandbox", "Use sandbox");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Fields.UseSandbox.Hint", "Determine whether to use sandbox credentials.");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.Instructions", @"
                 <p>
                     For plugin configuration follow these steps:<br />
                     <br />
-                    1. Create a <a href=""https://connect.squareup.com/apps"" target=""_blank"">Square application</a><br />
-                    2. Copy your Application ID from the 'Credentials' tab and your Application secret from the 'OAuth' tab<br />
-                    3. Save<br /> 
-                    4. Copy this '<em>{0}</em>' URL into the 'Redirect URL' field on the 'OAuth' tab<br />
-                    5. Click the 'Obtain access token' button to get the access token (recommended), or copy your Personal Access Token from the 'Credentials' tab<br />
-                    6. Save<br />
-                    7. Choose the business location. Location is a required parameter for payment requests<br />
-                    8. Fill in the remaining fields and save to complete the configuration<br />
+                    1. You will need a Square Merchant account. If you don't already have one, you can sign up here: <a href=""http://squ.re/nopcommerce"" target=""_blank"">https://squareup.com/signup/</a><br />
+                    <em>Important: Your merchant account must have at least one location with enabled credit card processing. Please refer to the Square customer support if you have any questions about how to set this up.</em><br />
+                    2. Sign in to your Square Developer Portal at <a href=""http://squ.re/nopcommerce1"" target=""_blank"">https://connect.squareup.com/apps</a>; use the same sign in credentials as your merchant account.<br />
+                    3. Click on '+New Application' and fill in the Application Name. This name is for you to recognize the application in the developer portal and is not used by the extension. Click 'Create Application' at the bottom of the page.<br />
+                    4. In the Square Developer admin go to 'Credentials' tab. Copy the Application ID and paste it into Application ID below.<br />
+                    5. In the Square Developer admin go to 'OAuth' tab. Click 'Show Secret'. Copy the Application Secret and paste it into Application Secret below. Click 'Save' on this page.<br />
+                    6. Copy this URL: <em>{0}</em>. Go to the Square Developer admin, go to 'OAuth' tab, and paste this URL into Redirect URL. Click 'Save'.<br />
+                    7. On this page click 'Obtain access token' below; the Access token field should populate. Click 'Save' below.<br />
+                    8. Choose the business location. Location is a required parameter for payment requests.<br />
+                    9. Fill in the remaining fields and save to complete the configuration.<br />
                     <br />
                     <em>Note: The payment form must be generated only on a webpage that uses HTTPS.</em><br />
                 </p>");
@@ -655,7 +673,9 @@ namespace Nop.Plugin.Payments.Square
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.PaymentMethodDescription", "Pay by credit card using Square");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.RenewAccessToken.Error", "Square payment error. An error occurred while renewing an access token");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.RenewAccessToken.Success", "Square payment info. The access token was successfully renewed");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.TaskChanged", "Task parameters has been changed, please restart the application");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.RevokeAccessTokens", "Revoke access tokens");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.RevokeAccessTokens.Error", "An error occurred while revoking access tokens");
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payments.Square.RevokeAccessTokens.Success", "All access tokens were successfully revoked");
             
             base.Install();
         }
@@ -676,10 +696,9 @@ namespace Nop.Plugin.Payments.Square
             //locales
             this.DeletePluginLocaleResource("Enums.Nop.Plugin.Payments.Square.Domain.TransactionMode.Authorize");
             this.DeletePluginLocaleResource("Enums.Nop.Plugin.Payments.Square.Domain.TransactionMode.Charge");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.AccessTokenRenewalPeriod.Error");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.AccessToken");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.AccessToken.Hint");
-            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.AccessTokenRenewalPeriod");
-            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.AccessTokenRenewalPeriod.Hint");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.AdditionalFee");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.AdditionalFee.Hint");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.AdditionalFeePercentage");
@@ -694,6 +713,10 @@ namespace Nop.Plugin.Payments.Square
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.Location.NotExist");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.PostalCode");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.PostalCode.Key");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxAccessToken");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxAccessToken.Hint");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxApplicationId");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.SandboxApplicationId.Hint");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.SaveCard");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.SaveCard.Key");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.StoredCard");
@@ -702,6 +725,8 @@ namespace Nop.Plugin.Payments.Square
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.StoredCard.SelectCard");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.TransactionMode");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.TransactionMode.Hint");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.UseSandbox");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.Fields.UseSandbox.Hint");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.Instructions");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.ObtainAccessToken");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.ObtainAccessToken.Error");
@@ -709,7 +734,9 @@ namespace Nop.Plugin.Payments.Square
             this.DeletePluginLocaleResource("Plugins.Payments.Square.PaymentMethodDescription");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.RenewAccessToken.Error");
             this.DeletePluginLocaleResource("Plugins.Payments.Square.RenewAccessToken.Success");
-            this.DeletePluginLocaleResource("Plugins.Payments.Square.TaskChanged");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.RevokeAccessTokens");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.RevokeAccessTokens.Error");
+            this.DeletePluginLocaleResource("Plugins.Payments.Square.RevokeAccessTokens.Success");
 
             base.Uninstall();
         }
