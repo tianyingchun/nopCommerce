@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Tyc",
+  "FriendlyName": "Tyc Eyeglass",
+  "SystemName": "Tyc.Eyeglass",
+  "Version": "1.0",
+  "SupportedVersions": [ "4.00" ],
+  "Author": "Tianyingchun",
+  "DisplayOrder": 1,
+  "FileName": "Tyc.Plugin.Eyeglass.dll",
+  "Description": "This plugin allows you implements mobile device auto detect for eyeglass"
+}
