@@ -34,8 +34,14 @@
     <Content Update="App_Data\DataProtectionKeys\*.xml" CopyToPublishDirectory="Never" />
 
     <Compile Remove="Plugins\**" />
+
+    <Compile Remove="Themes\Eyegclass\**" />
+
+    <Content Remove="Themes\Eyegclass\**" />
     <EmbeddedResource Remove="Plugins\**" />
+    <EmbeddedResource Remove="Themes\Eyegclass\**" />
     <None Remove="Plugins\**" />
+    <None Remove="Themes\Eyegclass\**" />
 
     <!-- We copy the entire \Plugins and \Themes directories.
 	    But we ignore cshtml and JSON files to avoid "Duplicate 'Content' items were included" error during publishing.
@@ -45,22 +51,8 @@
 
     <!-- We copy the \Logs directory -->
     <Content Include="Logs\**" CopyToPublishDirectory="PreserveNewest" />
-    <Content Remove="Themes\Eyegclass\preview.jpg" />
-    <None Include="Themes\Eyegclass\theme.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Themes\Eyegclass\Views\Shared\Head.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Themes\Eyegclass\Views\_ViewImports.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
 
     <None Update="Areas\Admin\sitemap.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-
-    <None Update="Themes\Eyegclass\preview.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

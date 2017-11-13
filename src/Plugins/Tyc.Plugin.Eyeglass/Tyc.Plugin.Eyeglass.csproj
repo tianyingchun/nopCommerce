@@ -16,12 +16,15 @@
   <ItemGroup>
     <Compile Remove="Content\**" />
     <Compile Remove="Scripts\**" />
+    <Compile Remove="Themes\Eyegclass\**" />
     <Compile Remove="Views\**" />
     <EmbeddedResource Remove="Content\**" />
     <EmbeddedResource Remove="Scripts\**" />
+    <EmbeddedResource Remove="Themes\Eyegclass\**" />
     <EmbeddedResource Remove="Views\**" />
     <None Remove="Content\**" />
     <None Remove="Scripts\**" />
+    <None Remove="Themes\Eyegclass\**" />
     <None Remove="Views\**" />
   </ItemGroup>
   
@@ -47,7 +50,7 @@
     <Content Include="plugin.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Themes\Eyegclass\Views\Home\Index.cshtml">
+    <Content Include="Themes\Eyeglass\Views\Home\Index.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -55,6 +58,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Presentation\Nop.Web.Framework\Nop.Web.Framework.csproj" />
+    <ProjectReference Include="..\..\Presentation\Nop.Web\Nop.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,22 +66,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Themes\Eyegclass\preview.jpg">
+    <None Update="Themes\Eyeglass\preview.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Themes\Eyegclass\theme.json">
+    <None Update="Themes\Eyeglass\theme.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Themes\Eyegclass\Views\Home\Index.Mobile.cshtml">
+    <None Update="Themes\Eyeglass\Views\Home\Index.Mobile.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Themes\Eyegclass\Views\Home\Index.Tablet.cshtml">
+    <None Update="Themes\Eyeglass\Views\Home\Index.Tablet.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Themes\Eyegclass\Views\Shared\Head.cshtml">
+    <None Update="Themes\Eyeglass\Views\Shared\Head.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Themes\Eyegclass\Views\_ViewImports.cshtml">
+    <None Update="Themes\Eyeglass\Views\_ViewImports.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
