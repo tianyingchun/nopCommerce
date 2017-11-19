@@ -5,19 +5,13 @@ using Nop.Services.Directory;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Web.Framework;
-using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using Tyc.Plugin.Eyeglass.Models;
 namespace Tyc.Plugin.Eyeglass.Controllers
 {
     [AuthorizeAdmin]
     [Area(AreaNames.Admin)]
-    public class EyeglassController : BasePluginController
+    public class EyeglassController : BaseEyeglassController
     {
         #region Fields
         private readonly CurrencySettings _currencySettings;
@@ -46,19 +40,36 @@ namespace Tyc.Plugin.Eyeglass.Controllers
 
         #region Methods
 
+
+        [AuthorizeAdmin]
+        [Area(AreaNames.Admin)]
+
         public IActionResult Configure()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageShippingSettings))
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePlugins))
                 return AccessDeniedView();
 
-            //var model = new ConfigurationModel
-            //{
-            //    LimitMethodsToCreated = _fixedOrByWeightSettings.LimitMethodsToCreated,
-            //    ShippingByWeightEnabled = _fixedOrByWeightSettings.ShippingByWeightEnabled
-            //};
-            return null;
-            //return View("~/Plugins/Shipping.FixedOrByWeight/Views/Configure.cshtml", model);
+            var model = new ConfigurationModel
+            {
+
+            };
+            return View("~/Plugins/Tyc.Eyeglass/Views/Configure.cshtml", model);
         }
+        [HttpPost]
+        [AuthorizeAdmin]
+        [AdminAntiForgery]
+        [Area(AreaNames.Admin)]
+        public IActionResult Configure(ConfigurationModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePlugins))
+                return AccessDeniedView();
+
+            if (!ModelState.IsValid)
+                return Configure();
+
+            return Content("hey this is post return view");
+        }
+
 
         #endregion
     }

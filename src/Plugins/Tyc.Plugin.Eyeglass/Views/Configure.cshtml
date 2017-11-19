@@ -1,0 +1,28 @@
+﻿@model Tyc.Plugin.Eyeglass.Models.ConfigurationModel
+
+@{
+    Layout = "_ConfigurePlugin";
+}
+
+@await Component.InvokeAsync("StoreScopeConfiguration")
+<form asp-controller="Eyeglass" asp-action="Configure" method="post">
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                welcome header bar
+            </div>
+            <div class="panel-body">
+               welcome testing 
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-9 col-md-offset-3">
+                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

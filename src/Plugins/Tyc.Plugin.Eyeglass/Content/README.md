@@ -1,0 +1,1 @@
+store all dependent static files of tyc.eyeglass plugin

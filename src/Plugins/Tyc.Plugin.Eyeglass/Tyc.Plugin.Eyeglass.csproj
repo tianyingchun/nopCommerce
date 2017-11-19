@@ -14,13 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Content\**" />
     <Compile Remove="Scripts\**" />
     <Compile Remove="Themes\Eyegclass\**" />
-    <EmbeddedResource Remove="Content\**" />
     <EmbeddedResource Remove="Scripts\**" />
     <EmbeddedResource Remove="Themes\Eyegclass\**" />
-    <None Remove="Content\**" />
     <None Remove="Scripts\**" />
     <None Remove="Themes\Eyegclass\**" />
   </ItemGroup>
@@ -51,6 +48,12 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\Configure.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\_ViewImports.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -63,6 +66,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Content\README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Themes\Eyeglass\preview.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -84,8 +90,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Views\" />
+    <Folder Include="Content\" />
   </ItemGroup>
   
   <!-- This target execute after "Build" target -->

@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Prescription
         /// <summary>
         /// Gets or sets the pictureId if user upload RX picture.
         /// </summary>
+        [DefaultValue(0)]
         public int PictureId { get; set; }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Prescription
         /// <summary>
         /// Gets or sets PD (Pupillary Distance) Right Eye
         /// </summary>
-        public string PDRight{ get; set; }
+        public string PDRight { get; set; }
 
         /// <summary>
         /// Gets or sets user extra comments messages for this prescription.

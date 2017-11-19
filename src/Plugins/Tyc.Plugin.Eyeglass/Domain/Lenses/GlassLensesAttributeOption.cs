@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
         /// <summary>
         /// Gets or sets the values indicates if current record depends on the parent glass lenses attribute option id has checked.
         /// </summary>
+        [DefaultValue(0)]
         public int ParentGlassLensesAttributeOptionId { get; set; }
 
         /// <summary>
