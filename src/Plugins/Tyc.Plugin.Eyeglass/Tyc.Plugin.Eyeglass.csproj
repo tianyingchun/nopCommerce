@@ -17,15 +17,12 @@
     <Compile Remove="Content\**" />
     <Compile Remove="Scripts\**" />
     <Compile Remove="Themes\Eyegclass\**" />
-    <Compile Remove="Views\**" />
     <EmbeddedResource Remove="Content\**" />
     <EmbeddedResource Remove="Scripts\**" />
     <EmbeddedResource Remove="Themes\Eyegclass\**" />
-    <EmbeddedResource Remove="Views\**" />
     <None Remove="Content\**" />
     <None Remove="Scripts\**" />
     <None Remove="Themes\Eyegclass\**" />
-    <None Remove="Views\**" />
   </ItemGroup>
   
   <ItemGroup>
@@ -34,7 +31,7 @@
   </ItemGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\..\Presentation\Nop.Web\Plugins\Widgets.NivoSlider</OutputPath>
+    <OutputPath>..\..\Presentation\Nop.Web\Plugins\Tyc.Eyeglass\</OutputPath>
     <OutDir>$(OutputPath)</OutDir>
   </PropertyGroup>
 
@@ -84,6 +81,11 @@
     <None Update="Themes\Eyeglass\Views\_ViewImports.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Views\" />
   </ItemGroup>
   
   <!-- This target execute after "Build" target -->

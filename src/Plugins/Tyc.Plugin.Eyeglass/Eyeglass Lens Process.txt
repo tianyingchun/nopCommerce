@@ -1,0 +1,5 @@
+﻿1. DISTANCE -> RX -> LENS THICKNESS ->LENS COLOR -> LENS COATINGS -->Add to cart
+2. READERS -> SIMPLE RX -> LENS THICKNESS -> LENS COATINGS -->Add to cart
+3. Computer Blue -> RX -> LENS THICKNESS -->Add to cart
+4. Bifocal & Progressive -> Bifocal Types -> Rx -> LENS THICKNESS -->Add to cart
+5. NonRx ->  LENS THICKNESS -> LENS COLOR -> LENS COATINGS -->Add to cart
