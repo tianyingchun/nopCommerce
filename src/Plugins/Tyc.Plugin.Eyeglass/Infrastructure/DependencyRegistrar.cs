@@ -16,6 +16,7 @@ using Nop.Web.Framework.Infrastructure;
 using Nop.Core.Data;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
 using Tyc.Plugin.Eyeglass.Domain.Prescription;
+using Nop.Services.Catalog;
 
 namespace Tyc.Plugin.Eyeglass.Infrastructure
 {
@@ -26,7 +27,9 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
             builder.RegisterType<GlassService>().As<IGlassService>().InstancePerLifetimeScope();
-            builder.RegisterType<LensPriceCalculationService>().As<ILensPriceCalculationService>().InstancePerLifetimeScope();
+            builder.RegisterType<LensPriceCalculationService>().As<IPriceCalculationService>().InstancePerLifetimeScope();
+            builder.RegisterType<PrescriptionService>().As<IPrescriptionService>().InstancePerLifetimeScope();
+            builder.RegisterType<LensesCheckoutService>().As<ILensesCheckoutService>().InstancePerLifetimeScope();
 
 
             //data context

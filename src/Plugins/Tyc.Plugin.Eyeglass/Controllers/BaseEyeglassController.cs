@@ -1,13 +1,18 @@
-﻿using Nop.Web.Framework.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
+using Nop.Web.Framework.Controllers;
 
 namespace Tyc.Plugin.Eyeglass.Controllers
 {
     public class BaseEyeglassController : BasePluginController
     {
+        public virtual IActionResult JsonOk(dynamic data, string message = "success")
+        {
+            return Json(new
+            {
+                code = "0000",
+                message = message,
+                data = data
+            });
+        }
     }
 }

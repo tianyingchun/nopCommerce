@@ -13,8 +13,9 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure
         public void RegisterRoutes(IRouteBuilder routeBuilder)
         {
             //ALLGlassType
-            routeBuilder.MapRoute("Plugin.Tyc.EyeglassApi.AllGlassType", "Plugins/EyeglassApi/AllGlassType",
+            routeBuilder.MapRoute("Plugin.Tyc.EyeglassApi.AllGlassType", "Plugins/TycApi/EyeglassApi/AllGlassType",
                  new { controller = "EyeglassApi", action = "AllGlassType" });
+
 
         }
 

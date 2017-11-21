@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tyc.Plugin.Eyeglass.Services
 {
-    public class ILensPriceCalculationService
+    public partial class PrescriptionService : IPrescriptionService
     {
     }
 }

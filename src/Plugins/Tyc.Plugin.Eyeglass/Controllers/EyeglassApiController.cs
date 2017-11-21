@@ -4,24 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tyc.Plugin.Eyeglass.Services;
 
 namespace Tyc.Plugin.Eyeglass.Controllers
 {
-    public class EyeglassApiController: BaseEyeglassController
+    public class EyeglassApiController : BaseEyeglassController
     {
-        public EyeglassApiController()
-        {
+        private readonly IGlassService _glassService;
 
+        public EyeglassApiController(IGlassService glassService)
+        {
+            this._glassService = glassService;
         }
-        // API: Plugins/EyeglassApi/AllGlassType
+        // API: Plugins/TycApi/EyeglassApi/AllGlassType
         public IActionResult AllGlassType()
         {
-            return Json(new
-            {
-                code = "0000",
-                message = "success",
-                data = new { name = "tianyingchun" }
-            });
+            return this.JsonOk(new { name = "tianyingchun" });
+        }
+
+        [Route("Plugins/TycApi/EyeglassApi/GetAllGlassLenses")]
+        public IActionResult GetAllGlassLenses()
+        {
+            var result = _glassService.GetAllGlassLenses();
+            return this.JsonOk(result);
         }
     }
 }

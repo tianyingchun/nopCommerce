@@ -25,7 +25,7 @@ namespace Tyc.Plugin.Eyeglass.Components
 
         public IViewComponentResult Invoke(string widgetZone, object additionalData)
         {
-            return Content("");
+            return Content("hey this is widget");
         }
 
     }

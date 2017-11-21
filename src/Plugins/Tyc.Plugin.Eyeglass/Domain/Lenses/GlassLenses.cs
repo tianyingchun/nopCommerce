@@ -35,7 +35,11 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
         /// </summary>
         public string HelpDescription { get; set; }
 
-    
+        /// <summary>
+        /// Gets or sets the DisplayOrder
+        /// </summary>
+        public int DisplayOrder { get; set; }
+
         /// <summary>
         /// Gets or sets the product type
         /// </summary>
