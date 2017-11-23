@@ -9,7 +9,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
 {
     public partial class GlassLensesAttribute: BaseEntity
     {
-        private ICollection<GlassLensesAttributeOption> _glasssLensesAttributeOptions;
+        private ICollection<GlassLensesAttributeOption> _glassLensesAttributeOptions;
 
 
         /// <summary>
@@ -32,14 +32,18 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
         /// </summary>
         public int GlassLensesId { get; set; }
 
+        /// <summary>
+        /// / Gets or sets the Glass lenses
+        /// </summary>
+        public GlassLenses GlassLenses { get; set; }
 
         /// <summary>
         /// Gets or sets the specification attribute options
         /// </summary>
-        public virtual ICollection<GlassLensesAttributeOption> GlasssLensesAttributeOptions
+        public virtual ICollection<GlassLensesAttributeOption> GlassLensesAttributeOptions
         {
-            get { return _glasssLensesAttributeOptions ?? (_glasssLensesAttributeOptions = new List<GlassLensesAttributeOption>()); }
-            protected set { _glasssLensesAttributeOptions = value; }
+            get { return _glassLensesAttributeOptions ?? (_glassLensesAttributeOptions = new List<GlassLensesAttributeOption>()); }
+            protected set { _glassLensesAttributeOptions = value; }
         }
 
 

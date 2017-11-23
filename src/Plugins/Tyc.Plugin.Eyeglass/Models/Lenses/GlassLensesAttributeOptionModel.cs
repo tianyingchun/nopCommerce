@@ -1,0 +1,13 @@
+﻿using Nop.Web.Framework.Mvc.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Tyc.Plugin.Eyeglass.Models.Lenses
+{
+    public partial class GlassLensesAttributeOptionModel : BaseNopModel
+    {
+    }
+}

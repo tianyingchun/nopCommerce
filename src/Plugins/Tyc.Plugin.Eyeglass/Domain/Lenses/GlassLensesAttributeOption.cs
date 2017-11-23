@@ -14,7 +14,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
         /// <summary>
         /// Gets or sets the attribute value type identifier
         /// </summary>
-        public int GlasssLensesAttributeId { get; set; }
+        public int GlassLensesAttributeId { get; set; }
 
         /// <summary>
         /// Gets or sets the glasslenses attribute name
@@ -66,7 +66,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
         /// <summary>
         /// Gets or sets the GlasssLenses attribute
         /// </summary>
-        public virtual GlassLensesAttribute GlasssLensesAttribute { get; set; }
+        public virtual GlassLensesAttribute GlassLensesAttribute { get; set; }
 
 
     }

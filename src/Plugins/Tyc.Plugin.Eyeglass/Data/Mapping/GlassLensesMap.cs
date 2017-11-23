@@ -18,7 +18,6 @@ namespace Tyc.Plugin.Eyeglass.Data.Mapping
             this.Ignore(p => p.GlassType);
 
             this.HasMany(p => p.GlassLensesAttributes);
-
         }
     }
 }
