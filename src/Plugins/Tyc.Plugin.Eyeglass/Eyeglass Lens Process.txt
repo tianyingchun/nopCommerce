@@ -7,9 +7,19 @@
 ## Picture: ##
 Full size image: 1200 * 600
 product detail image size: 800 * 400
+
 ## sample products firmoo 
 * https://www.firmoo.com/eyeglasses-p-4959.html
 * https://www.firmoo.com/eyeglasses-p-4916.html
 * https://www.firmoo.com/eyeglasses-p-5002.html
 * https://www.firmoo.com/eyeglasses-p-4999.html
 * https://www.firmoo.com/eyeglasses-p-5061.html
+
+## watch tools
+sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Plugins\Tyc.Plugin.Eyeglass\Views D:\2_Works\Eyeglasses\build\Plugins\Tyc.Eyeglass\Views
+sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Plugins\Tyc.Plugin.Eyeglass\Themes D:\2_Works\Eyeglasses\build\Plugins\Tyc.Eyeglass\Themes
+sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Plugins\Tyc.Plugin.Eyeglass\Content D:\2_Works\Eyeglasses\build\Plugins\Tyc.Eyeglass\Content
+sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Presentation\Nop.Web\Themes D:\2_Works\Eyeglasses\build\Themes
+
+
+D:\2_Works\Eyeglasses\nopCommerce\src\Presentation\Nop.Web\Themes

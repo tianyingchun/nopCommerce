@@ -1,0 +1,9 @@
+.gallery {
+  height: 2000px;
+}
+.gallery .picture img {
+  max-width: 100%;
+}
+.overview {
+  width: 400px;
+}

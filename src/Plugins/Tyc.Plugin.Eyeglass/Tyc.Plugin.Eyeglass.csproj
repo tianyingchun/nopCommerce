@@ -38,6 +38,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Content\Styles\product-detail.css">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="logo.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
