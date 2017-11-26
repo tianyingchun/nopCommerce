@@ -11,7 +11,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Prescription
     /// <summary>
     /// Represents a prescription of users
     /// </summary>
-    public partial class GlassPrescription : BaseEntity
+    public partial class GlassPrescription : BaseEyeGlassEntity
     {
 
         /// <summary>

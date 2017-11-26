@@ -10,7 +10,7 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
     /// <summary>
     /// Represents a glass
     /// </summary>
-    public partial class GlassLenses : BaseEntity
+    public partial class GlassLenses : BaseEyeGlassEntity
     {
         private ICollection<GlassLensesAttribute> _glassLensesAttributes;
 

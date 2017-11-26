@@ -14,8 +14,7 @@ namespace Tyc.Plugin.Eyeglass.Data.Mapping
         {
             this.ToTable("GlassLensesAttribute");
             this.HasKey(p => p.Id);
-
-            this.HasMany(p => p.GlassLensesAttributeOptions);
+            this.Ignore(p => p.GlassLensesAttributeType);
 
             this.HasRequired(p => p.GlassLenses)
                 .WithMany(p => p.GlassLensesAttributes)

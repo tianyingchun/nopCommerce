@@ -1,22 +1,18 @@
-﻿using Nop.Core.Infrastructure.DependencyManagement;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
-using Nop.Core.Configuration;
-using Nop.Core.Infrastructure;
+﻿using Autofac;
 using Autofac.Core;
-using Nop.Data;
-using Tyc.Plugin.Eyeglass.Services;
-using Tyc.Plugin.Eyeglass.Data;
-using Tyc.Plugin.Eyeglass.Domain;
-using Nop.Web.Framework.Infrastructure;
+using Nop.Core.Configuration;
 using Nop.Core.Data;
+using Nop.Core.Infrastructure;
+using Nop.Core.Infrastructure.DependencyManagement;
+using Nop.Data;
+using Nop.Services.Catalog;
+using Nop.Web.Framework.Infrastructure;
+using Tyc.Plugin.Eyeglass.Data;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
 using Tyc.Plugin.Eyeglass.Domain.Prescription;
-using Nop.Services.Catalog;
+using Tyc.Plugin.Eyeglass.Services.Checkout;
+using Tyc.Plugin.Eyeglass.Services.Lenses;
+using Tyc.Plugin.Eyeglass.Services.Prescription;
 
 namespace Tyc.Plugin.Eyeglass.Infrastructure
 {

@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 using Tyc.Plugin.Eyeglass.Domain;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
 
-namespace Tyc.Plugin.Eyeglass.Services
+namespace Tyc.Plugin.Eyeglass.Services.Lenses
 {
     public partial interface IGlassService
     {
         /// <summary>
         /// Delete a glassLenses
         /// </summary>
-        /// <param name="product">GlassLenses</param>
+        /// <param name="glassLenses">GlassLenses</param>
         void DeleteGlassLenses(GlassLenses glassLenses);
 
 
         /// <summary>
         /// Inserts a glassLenses
         /// </summary>
-        /// <param name="product">GlassLenses</param>
+        /// <param name="glassLenses">GlassLenses</param>
         void InsertGlassLenses(GlassLenses glassLenses);
 
         /// <summary>

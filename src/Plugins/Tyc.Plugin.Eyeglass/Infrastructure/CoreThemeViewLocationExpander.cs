@@ -28,8 +28,8 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure
                 viewLocations = new[] {
                         $"/Plugins/Tyc.Eyeglass/Themes/{theme}/Views/{{1}}/{{0}}.cshtml",
                         $"/Plugins/Tyc.Eyeglass/Themes/{theme}/Views/Shared/{{0}}.cshtml",
-                        //$"/Themes/{theme}/Views/{{1}}/{{0}}.cshtml",
-                        //$"/Themes/{theme}/Views/Shared/{{0}}.cshtml",
+                        $"/Plugins/Tyc.Eyeglass/Views/{{1}}/{{0}}.cshtml",
+                        $"/Plugins/Tyc.Eyeglass/Views/Shared/{{0}}.cshtml",
                     }
                     .Concat(viewLocations);
             }

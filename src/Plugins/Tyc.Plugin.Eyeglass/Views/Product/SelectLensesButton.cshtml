@@ -1,0 +1,12 @@
+﻿@model Tyc.Plugin.Eyeglass.Models.Catalog.SelectLensesModel
+@{
+    var dataDictAddToCart = new ViewDataDictionary(ViewData);
+    dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
+    @await Html.PartialAsync("_AddToCart", Model.ProductDetailsModel.AddToCart, dataDictAddToCart)
+}
+<div>
+    @foreach (var item in Model.GlassLensesItems)
+    {
+        <div>@item.Name</div>
+    }
+</div>

@@ -53,7 +53,7 @@ namespace Tyc.Plugin.Eyeglass.Controllers
             {
 
             };
-            return View("~/Plugins/Tyc.Eyeglass/Views/Configure.cshtml", model);
+            return View("~/Plugins/Tyc.Eyeglass/Views/Admin/Configure.cshtml", model);
         }
         [HttpPost]
         [AuthorizeAdmin]

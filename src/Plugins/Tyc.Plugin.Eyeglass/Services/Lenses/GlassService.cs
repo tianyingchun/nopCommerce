@@ -4,30 +4,13 @@ using Nop.Services.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tyc.Plugin.Eyeglass.Domain;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
+using Tyc.Plugin.Eyeglass.Infrastructure.Cache;
 
-namespace Tyc.Plugin.Eyeglass.Services
+namespace Tyc.Plugin.Eyeglass.Services.Lenses
 {
     public class GlassService : IGlassService
     {
-        #region Constants
-
-        /// <summary>
-        /// Key for caching
-        /// </summary>
-        /// <remarks>
-        /// {0} : glassLenses ID
-        /// </remarks>
-        private const string GLASSLENSES_BY_ID_KEY = "tyc.glasslenses.id-{0}";
-        /// <summary>
-        /// Key pattern to clear cache
-        /// </summary>
-        private const string GLASSLENSES_PATTERN_KEY = "tyc.glasslenses.";
-
-        #endregion
 
         #region Fields
 
@@ -57,11 +40,11 @@ namespace Tyc.Plugin.Eyeglass.Services
             if (glassLenses == null)
                 throw new ArgumentNullException(nameof(glassLenses));
 
-            //delete product
+            //delete
             _glassLensesRepository.Delete(glassLenses);
 
             //clear cache
-            _cacheManager.RemoveByPattern(GLASSLENSES_PATTERN_KEY);
+            _cacheManager.RemoveByPattern(ModelCacheEventConsumer.GLASSLENSES_PATTERN_KEY);
 
             //event notification
             _eventPublisher.EntityDeleted(glassLenses);
@@ -69,11 +52,17 @@ namespace Tyc.Plugin.Eyeglass.Services
 
         public IList<GlassLenses> GetAllGlassLenses()
         {
-            var query = from p in _glassLensesRepository.Table
-                        orderby p.DisplayOrder, p.Id
-                        select p;
+            var key = string.Format(ModelCacheEventConsumer.GLASSLENSES_LIST_KEY);
 
-            return query.ToList();
+            return _cacheManager.Get(key, () =>
+            {
+                var query = from p in _glassLensesRepository.Table
+                            orderby p.DisplayOrder, p.Id
+                            select p;
+
+                return query.ToList();
+            });
+
         }
 
         public GlassLenses GetGlassLensesById(int glassLensesId)
@@ -81,7 +70,7 @@ namespace Tyc.Plugin.Eyeglass.Services
             if (glassLensesId == 0)
                 return null;
 
-            var key = string.Format(GLASSLENSES_BY_ID_KEY, glassLensesId);
+            var key = string.Format(ModelCacheEventConsumer.GLASSLENSES_BY_ID_KEY, glassLensesId);
             return _cacheManager.Get(key, () => _glassLensesRepository.GetById(glassLensesId));
         }
 
@@ -94,7 +83,7 @@ namespace Tyc.Plugin.Eyeglass.Services
             _glassLensesRepository.Insert(glassLenses);
 
             //clear cache
-            _cacheManager.RemoveByPattern(GLASSLENSES_PATTERN_KEY);
+            _cacheManager.RemoveByPattern(ModelCacheEventConsumer.GLASSLENSES_PATTERN_KEY);
 
             //event notification
             _eventPublisher.EntityInserted(glassLenses);
@@ -109,7 +98,7 @@ namespace Tyc.Plugin.Eyeglass.Services
             _glassLensesRepository.Update(glassLenses);
 
             //cache
-            _cacheManager.RemoveByPattern(GLASSLENSES_PATTERN_KEY);
+            _cacheManager.RemoveByPattern(ModelCacheEventConsumer.GLASSLENSES_PATTERN_KEY);
 
             //event notification
             _eventPublisher.EntityUpdated(glassLenses);

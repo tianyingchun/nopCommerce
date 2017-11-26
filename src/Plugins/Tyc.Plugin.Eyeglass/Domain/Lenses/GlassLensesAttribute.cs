@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Tyc.Plugin.Eyeglass.Domain.Lenses
 {
-    public partial class GlassLensesAttribute: BaseEntity
+    public partial class GlassLensesAttribute : BaseEyeGlassEntity
     {
         private ICollection<GlassLensesAttributeOption> _glassLensesAttributeOptions;
 
@@ -36,6 +36,26 @@ namespace Tyc.Plugin.Eyeglass.Domain.Lenses
         /// / Gets or sets the Glass lenses
         /// </summary>
         public GlassLenses GlassLenses { get; set; }
+
+        /// <summary>
+        /// / Gets or sets the GlassLensesAttributeType Identifier
+        /// </summary>
+        public int GlassLensesAttributeTypeId { get; set; }
+
+        /// <summary>
+        /// / Gets or sets the GlassLensesAttributeType
+        /// </summary>
+        public GlassLensesAttributeType GlassLensesAttributeType
+        {
+            get
+            {
+                return (GlassLensesAttributeType)GlassLensesAttributeTypeId;
+            }
+            set
+            {
+                GlassLensesAttributeTypeId = (int)value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the specification attribute options

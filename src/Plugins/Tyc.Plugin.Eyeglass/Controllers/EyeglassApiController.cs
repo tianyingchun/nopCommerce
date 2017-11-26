@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tyc.Plugin.Eyeglass.Models.Lenses;
-using Tyc.Plugin.Eyeglass.Services;
+using Tyc.Plugin.Eyeglass.Services.Lenses;
 
 namespace Tyc.Plugin.Eyeglass.Controllers
 {
@@ -39,18 +39,9 @@ namespace Tyc.Plugin.Eyeglass.Controllers
                     HelpDescription = item.HelpDescription,
                     ShortDescription = item.ShortDescription
                 };
-                foreach (var attribute in item.GlassLensesAttributes)
-                {
-                    model.GlassLensesAttributes.Add(new GlassLensesAttributeModel
-                    {
-                        Name = attribute.Name,
-                        Description = attribute.Description,
-                        DisplayOrder = attribute.DisplayOrder
-                    });
-                }
                 result.Add(model);
             }
-           
+
             return this.JsonOk(result);
         }
     }

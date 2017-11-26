@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nop.Core.Infrastructure;
-using Tyc.Plugin.Eyeglass.Infrastructure;
 using Wangkanai.Responsive;
 
-namespace Tyc.Plugin.Core.Infrastructure
+namespace Tyc.Plugin.Eyeglass.Infrastructure
 {
     public class CoreStartup : INopStartup
     {

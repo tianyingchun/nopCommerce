@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Tyc.Plugin.Eyeglass.Domain.Lenses
 {
-    public partial class GlassLensesAttributeOption : BaseEntity
+    public partial class GlassLensesAttributeOption : BaseEyeGlassEntity
     {
 
         /// <summary>

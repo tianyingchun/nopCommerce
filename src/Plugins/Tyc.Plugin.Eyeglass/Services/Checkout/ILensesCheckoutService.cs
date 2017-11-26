@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tyc.Plugin.Eyeglass.Services
+namespace Tyc.Plugin.Eyeglass.Services.Checkout
 {
-    public partial class PrescriptionService : IPrescriptionService
+    public partial interface ILensesCheckoutService
     {
+
     }
 }

@@ -1,0 +1,24 @@
+﻿@model ProductDetailsModel
+@{
+    Html.AddScriptParts(ResourceLocation.Footer, "~/lib/magnific-popup/jquery.magnific-popup.min.js");
+    Html.AddCssFileParts("~/lib/magnific-popup/magnific-popup.css");
+}
+<div class="gallery">
+
+    @if (Model.PictureModels.Count > 1)
+    {
+        <div class="picture">
+            @foreach (var picture in Model.PictureModels)
+            {
+                <div class="picture-item">
+                    <img src="@picture.FullSizeImageUrl" alt="@picture.AlternateText" title="@picture.Title" data-defaultsize="@picture.ImageUrl" data-fullsize="@picture.FullSizeImageUrl" />
+                </div>
+            }
+        </div>
+        <script type="text/javascript" asp-location="Footer">
+            $(document).ready(function () {
+                
+            });
+        </script>
+    }
+</div>

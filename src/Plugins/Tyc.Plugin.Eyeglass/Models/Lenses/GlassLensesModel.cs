@@ -12,18 +12,13 @@ namespace Tyc.Plugin.Eyeglass.Models.Lenses
     {
         public GlassLensesModel()
         {
-            GlassLensesAttributes = new List<GlassLensesAttributeModel>();
         }
-
-        public IList<GlassLensesAttributeModel> GlassLensesAttributes { get; set; }
 
         public string Name { get; set; }
 
-  
         public GlassType GlassType { get; set; }
 
         public string ShortDescription { get; set; }
-
 
         public string HelpDescription { get; set; }
 
