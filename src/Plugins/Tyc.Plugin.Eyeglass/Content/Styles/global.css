@@ -10,9 +10,9 @@
 *,
 *:before,
 *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
 
 html {
@@ -74,8 +74,8 @@ body {
   max-width: 100%;
   overflow-x: hidden;
   background-color: #fff;
-  font: normal 14px Arial, Helvetica, sans-serif;
-  color: #777;
+  font: normal 14px Roboto-ebd,Helvetica,Arial,sans-serif;
+  color: #000;
 }
 
 h1,

@@ -28,7 +28,17 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure
         }
 
         // NopCommonStartup Order==100
-        public int Order => 90;
+        // Make sure this plugin <INopStartup> will be loaded after Nop.Web.Framework
+        // Theme finder orders: 
+        // $"/Plugins/Tyc.Eyeglass/Themes/{theme}/Views/{{1}}/{{0}}.cshtml",
+        // $"/Plugins/Tyc.Eyeglass/Themes/{theme}/Views/Shared/{{0}}.cshtml",
+        // $"/Plugins/Tyc.Eyeglass/Views/{{1}}/{{0}}.cshtml",
+        // $"/Plugins/Tyc.Eyeglass/Views/Shared/{{0}}.cshtml",
+        // $"/Themes/{theme}/Views/{{1}}/{{0}}.cshtml",
+        // $"/Themes/{theme}/Views/Shared/{{0}}.cshtml",
+        // $"/Views/{{1}}/{{0}}.cshtml",
+        // $"/Views/Shared/{{0}}.cshtml",
+        public int Order => 110;
 
     }
 }

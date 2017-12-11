@@ -6,9 +6,8 @@
     Layout = "_ColumnsOne";
 
     Html.AddCssFileParts("~/Plugins/Tyc.Eyeglass/Content/Styles/product-detail.css");
-    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/Tyc.Eyeglass/Content/Scripts/rAF.js");
-    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/Tyc.Eyeglass/Content/Scripts/resize-sensor.js");
-    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/Tyc.Eyeglass/Content/Scripts/jquery.sticky-sidebar.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/Tyc.Eyeglass/Content/Scripts/jquery.scrollTo.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/Tyc.Eyeglass/Content/Scripts/jquery.sticky-sidebar.min.js");
 
     //title
     Html.AddTitleParts(!string.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
@@ -64,7 +63,7 @@
                     @await Html.PartialAsync("_ProductDetailsPictures", Model)
                     @await Component.InvokeAsync("Widget", new { widgetZone = "productdetails_after_pictures", additionalData = Model.Id })
                     <div class="overview" id="sidebar">
-                        <div class="sidebar-innner">
+                        <div class="sidebar-inner">
                             @await Html.PartialAsync("_Discontinued", Model)
                             <div class="product-name">
                                 <h1 itemprop="name">
@@ -83,13 +82,13 @@
                             <!--manufacturers-->
                             @await Html.PartialAsync("_ProductManufacturers", Model.ProductManufacturers)
                             <!--availability-->
-                            @await Html.PartialAsync("_Availability", Model)
+                            @*@await Html.PartialAsync("_Availability", Model)*@
                             <!--SKU, MAN, GTIN, vendor-->
-                            @await Html.PartialAsync("_SKU_Man_GTIN_Ven", Model)
+                            @*@await Html.PartialAsync("_SKU_Man_GTIN_Ven", Model)*@
                             <!--delivery-->
                             @await Html.PartialAsync("_DeliveryInfo", Model)
                             <!--sample download-->
-                            @await Html.PartialAsync("_DownloadSample", Model)
+                            @*@await Html.PartialAsync("_DownloadSample", Model)*@
                             <!--attributes-->
                             @{
                                 var dataDictAttributes = new ViewDataDictionary(ViewData);
@@ -132,7 +131,7 @@
                                     dataDictAddToWishlist.TemplateInfo.HtmlFieldPrefix = $"addtocart_{Model.Id}";
                                     @await Html.PartialAsync("_AddToWishlist", Model.AddToCart, dataDictAddToWishlist)
                                 }
-                                @await Html.PartialAsync("_CompareProductsButton", Model)
+                                @*@await Html.PartialAsync("_CompareProductsButton", Model)*@
                                 @await Html.PartialAsync("_ProductEmailAFriendButton", Model)
                                 @await Component.InvokeAsync("Widget", new { widgetZone = "productdetails_inside_overview_buttons_after", additionalData = Model.Id })
                             </div>
@@ -148,6 +147,7 @@
                     </div>
                  
                 </div>
+                @await Html.PartialAsync("_ProductDimenssions", Model)
                 @await Component.InvokeAsync("Widget", new { widgetZone = "productdetails_before_collateral", additionalData = Model.Id })
                 <div class="product-collateral">
                     @await Html.PartialAsync("_ProductSpecifications", Model.ProductSpecifications)
@@ -161,14 +161,12 @@
     </div>
     <script type="text/javascript" asp-location="Footer">
         $(document).ready(function () {
-
             $('#sidebar').stickySidebar({
                 topSpacing: 0,
                 bottomSpacing: 0,
                 containerSelector: '.product-essential',
-                innerWrapperSelector: '.sidebar-inner'
+                innerWrapperSelector:'.sidebar-inner'
             });
-
         });
     </script>
 </div>

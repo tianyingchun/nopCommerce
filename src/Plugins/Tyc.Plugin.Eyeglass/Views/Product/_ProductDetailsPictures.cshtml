@@ -1,10 +1,10 @@
 ﻿@model ProductDetailsModel
+@inject Nop.Core.IWebHelper webHelper
 @{
     Html.AddScriptParts(ResourceLocation.Footer, "~/lib/magnific-popup/jquery.magnific-popup.min.js");
     Html.AddCssFileParts("~/lib/magnific-popup/magnific-popup.css");
 }
 <div class="gallery">
-
     @if (Model.PictureModels.Count > 1)
     {
         <div class="picture">
@@ -12,12 +12,38 @@
             {
                 <div class="picture-item">
                     <img src="@picture.FullSizeImageUrl" alt="@picture.AlternateText" title="@picture.Title" data-defaultsize="@picture.ImageUrl" data-fullsize="@picture.FullSizeImageUrl" />
+                    <span class="full-screen-pictures">Full screen</span>
+                    <span href="#dimensions-popup" class="product-picture-dimensions"><i class="icon-dimensions"></i>&nbsp;&nbsp;Dimensions</span>
                 </div>
             }
         </div>
         <script type="text/javascript" asp-location="Footer">
             $(document).ready(function () {
-                
+                var images = [];
+                //$('.product-essential').css({
+                //    height: Math.max($('.overview').height(), $('.gallery').height())
+                //});
+                $('.gallery').find('img').each(function(index, item) {
+                    images.push({
+                        src: $(item).attr('src')
+                    });
+                });
+                $('.picture-item')
+                    .mouseenter(function() {
+                        $(this).find('.full-screen-pictures').show();
+                    }).mouseleave(function() {
+                        $(this).find('.full-screen-pictures').hide();
+                    });
+                $('.full-screen-pictures').magnificPopup({
+                    items: images,
+                    type: 'image',
+                    closeOnContentClick: false,
+                    closeBtnInside: false,
+                    mainClass: 'mfp-with-zoom mfp-img-mobile',
+                    gallery: {
+                        enabled: true
+                    }
+                });
             });
         </script>
     }

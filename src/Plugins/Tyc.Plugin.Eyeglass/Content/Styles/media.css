@@ -1253,10 +1253,10 @@
     clear: both;
   }
   /*** PRODUCT PAGE ***/
-  .overview {
+  /* .overview {
     float: right;
     width: 52%;
-  }
+  } */
   .rental-attributes {
     overflow: hidden;
   }

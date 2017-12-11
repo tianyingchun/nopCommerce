@@ -1,0 +1,125 @@
+@model ProductDetailsModel
+@inject Nop.Core.IWebHelper webHelper
+
+<div class="product-dimensions">
+    <div class="dimensions-introuction">
+        <div class="dimensions-introuction-head"><strong>Dimension</strong> Please do check frame size <div class="unit-wrap"><span class="active">mm</span><span>inch</span></div></div>
+        <p>The ruler in the picture cannot be used to measure your old glasses.<br> Please use your measuring tool to check the size of old pair of glasses.(2-3mm difference acceptable)</p>
+    </div>
+    <div class="dimensions-ruler">
+        <img src="@(webHelper.GetStoreLocation()+"Plugins/Tyc.Eyeglass/Content/Images/icons/product_info_ruler_.png")" />
+    </div>
+    <div class="product-dimension-container">
+        <div class="item-one">
+            <canvas id="dimension-item-one"></canvas>
+            <img id="dimension-item-one-image" src="@(webHelper.GetStoreLocation()+"Plugins/Tyc.Eyeglass/Content/Images/icons/intr01.png")" />
+        </div>
+        <div class="item-two">
+            <canvas id="dimension-item-two" ></canvas>
+            <img id="dimension-item-two-image" src="@(webHelper.GetStoreLocation()+"Plugins/Tyc.Eyeglass/Content/Images/icons/intr02.png")" />
+        </div>
+    </div>
+</div>
+<script type="text/javascript" asp-location="Footer">
+    function resizeCanvas() {
+        $('#dimension-item-one').css({
+            width: $('#dimension-item-one-image').width(),
+            height: $('#dimension-item-one-image').height(),
+        });
+        $('#dimension-item-two').css({
+            width: $('#dimension-item-two-image').width(),
+            height: $('#dimension-item-two-image').height(),
+        });
+    }
+
+    function drawText(dataPoints, container) {
+
+        var $container = $(container)
+        var canvas = $container.parent().find('canvas')[0];
+        if (!canvas || !canvas.getContext){
+            console.log('Don\'t support canvus');
+            return;
+        }
+        var context = canvas.getContext("2d");
+        var canvasOldWidth = canvas.width;
+        var canvasOldHeight = canvas.height;
+        var containerWdith = $container.width();
+        var containerHeight = $container.height();
+        var devicePixelRatio = window.devicePixelRatio || 1;
+        var backingStoreRatio =
+            context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 1;
+        var deviceRatio = devicePixelRatio / backingStoreRatio;
+
+        var dpiWidth = containerWdith /canvasOldWidth * deviceRatio;
+        var dpiHeight = containerHeight /canvasOldHeight * deviceRatio;
+        canvas.width = canvasOldWidth * dpiWidth;
+        canvas.height = canvasOldHeight * dpiHeight;
+        canvas.style.width = containerWdith + 'px';
+        canvas.style.height = containerHeight + 'px';
+        context.scale(dpiWidth, dpiHeight);
+        context.font = "lighter 10px Verdana,Arial,sans-serif";
+        context.fillStyle = "#323232";
+        context.textAlign = "start";
+        context.textBaseline = "top";
+        $.each(dataPoints, function (index, point) {
+            if (point.rotateAngle) {
+                context.rotate(Math.PI/180 * point.rotateAngle);
+            }
+            var position = point.position;
+            context.fillText(point.text, position.x/dpiWidth, position.y/dpiHeight);
+            context.save();
+        });
+    }
+    
+    $(document).ready(function () {
+        resizeCanvas();
+        $(window).on('resize', resizeCanvas);
+        var dimensionData = {
+            templeLength: { "mm": "143 mm", "in": "5.63 in" },
+            totalWidth: { "mm": "130 mm", "in": "5.12 in" },
+            lensWidth: { "mm": "52 mm", "in": "2.05 in" },
+            lensHeight: { "mm": "44 mm", "in": "1.74 in" },
+            opposite: { "mm": "53 mm", "in": "2.05 in" },
+            bridgeDistance: { "mm": "18 mm", "in": "0.71 in" }
+        };
+        var $itemImageOne = $('#dimension-item-one-image');
+        var $itemImageTwo = $('#dimension-item-two-image');
+        var dataPoints = [
+            {
+                text: dimensionData.totalWidth['mm'],
+                position: {x:200, y:10 },
+                rotateAngle: 0
+            },
+            {
+                text: dimensionData.lensWidth['mm'],
+                position: {x:60, y:80 },
+                rotateAngle: 0
+            },
+            {
+                text: dimensionData.lensHeight['mm'],
+                position: {x:335, y:100 },
+                rotateAngle: 0
+            },
+            {
+                text: dimensionData.bridgeDistance['mm'],
+                position: {x:190, y:120 },
+                rotateAngle: 0
+            },
+            {
+                text: dimensionData.opposite['mm'],
+                position: {x:-10, y:150 },
+                rotateAngle: -30
+            }
+        ]
+        drawText(dataPoints, $itemImageOne);
+        drawText([{text: dimensionData.templeLength['mm'], position: {x:190, y: 150}}], $itemImageTwo);
+
+        $('.gallery').on('click','.product-picture-dimensions', function() {
+           $(window).scrollTo($(".product-dimensions"), 500);
+        });
+    });
+</script>
