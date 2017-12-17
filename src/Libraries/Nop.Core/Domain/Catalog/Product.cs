@@ -516,6 +516,39 @@ namespace Nop.Core.Domain.Catalog
         /// </summary>
         public decimal Height { get; set; }
 
+        /// UPDATED BY TIANYINGCHUN START
+    
+        /// <summary>
+        /// Gets or sets the glass frame oneSide width
+        /// </summary>
+        public decimal FrameWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the glass frame oneSide height
+        /// </summary>
+        public decimal FrameHeight { get; set; }
+
+   
+        /// <summary>
+        /// Gets or sets the glass frame opposite 
+        /// </summary>
+        public decimal FrameOpposite { get; set; }
+
+        /// <summary>
+        /// Gets or sets the glass frame total width
+        /// </summary>
+        public decimal FrameTotalWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the glass frame bridge distane 
+        /// </summary>
+        public decimal FrameBridgeDistance { get; set; }
+        /// <summary>
+        /// Gets or sets the glass frame temple length 
+        /// </summary>
+        public decimal FrameTempleLength {get; set; }
+        /// UPDATED BY TIANYINGCHUN END
+
         /// <summary>
         /// Gets or sets the available start date and time
         /// </summary>

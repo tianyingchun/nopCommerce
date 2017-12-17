@@ -30,6 +30,16 @@ namespace Nop.Data.Mapping.Catalog
             this.Property(p => p.Length).HasPrecision(18, 4);
             this.Property(p => p.Width).HasPrecision(18, 4);
             this.Property(p => p.Height).HasPrecision(18, 4);
+
+            // UPDATED BY TIANYINGCHUN START
+            this.Property(p => p.FrameWidth).HasPrecision(18, 4);
+            this.Property(p => p.FrameHeight).HasPrecision(18, 4);
+            this.Property(p => p.FrameOpposite).HasPrecision(18, 4);
+            this.Property(p => p.FrameTotalWidth).HasPrecision(18, 4);
+            this.Property(p => p.FrameBridgeDistance).HasPrecision(18, 4);
+            this.Property(p => p.FrameTempleLength).HasPrecision(18, 4);
+            // UPDATED BY TIANYINGCHUN END
+
             this.Property(p => p.RequiredProductIds).HasMaxLength(1000);
             this.Property(p => p.AllowedQuantities).HasMaxLength(1000);
             this.Property(p => p.BasepriceAmount).HasPrecision(18, 4);

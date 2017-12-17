@@ -87,6 +87,7 @@
             $('#group-rental').show();
             $('#group-shipping').show();
             $('#group-inventory').show();
+            $('#group-glass-frame').show();
             $('#group-visible-individually').show();
             $('#group-associated-products').hide();
         } else if (selectedProductTypeId == groupedProductId) {
@@ -98,6 +99,7 @@
             $('#group-recurring').hide();
             $('#group-rental').hide();
             $('#group-shipping').hide();
+            $('#group-glass-frame').hide();
             $('#group-inventory').hide();
             $('#group-visible-individually').hide();
             $('#group-associated-products').show();
@@ -1689,6 +1691,57 @@
                         <div class="@rightColumnClass">
 							<nop-editor asp-for="NotReturnable" />
 							<span asp-validation-for="NotReturnable"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="panel panel-default no-margin" id="group-glass-frame">
+                <div class="panel-heading">
+                    @T("Admin.Catalog.Products.frame")
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="FrameWidth" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-editor asp-for="FrameWidth" asp-postfix="@Model.BaseDimensionIn" />
+                            <span asp-validation-for="FrameWidth"></span>
+                        </div>
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="FrameHeight" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-editor asp-for="FrameHeight" asp-postfix="@Model.BaseDimensionIn" />
+                            <span asp-validation-for="FrameHeight"></span>
+                        </div>
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="FrameOpposite" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-editor asp-for="FrameOpposite" asp-postfix="@Model.BaseDimensionIn" />
+                            <span asp-validation-for="FrameOpposite"></span>
+                        </div>
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="FrameTotalWidth" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-editor asp-for="FrameTotalWidth" asp-postfix="@Model.BaseDimensionIn" />
+                            <span asp-validation-for="FrameTotalWidth"></span>
+                        </div>
+                         <div class="@leftColumnClass">
+                            <nop-label asp-for="FrameBridgeDistance" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-editor asp-for="FrameBridgeDistance" asp-postfix="@Model.BaseDimensionIn" />
+                            <span asp-validation-for="FrameBridgeDistance"></span>
+                        </div>
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="FrameTempleLength" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-editor asp-for="FrameTempleLength" asp-postfix="@Model.BaseDimensionIn" />
+                            <span asp-validation-for="FrameTempleLength"></span>
                         </div>
                     </div>
                 </div>

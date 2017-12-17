@@ -1,9 +1,9 @@
 @model ProductDetailsModel
 @inject Nop.Core.IWebHelper webHelper
-
+@inject IJsonHelper Json;
 <div class="product-dimensions">
     <div class="dimensions-introuction">
-        <div class="dimensions-introuction-head"><strong>Dimension</strong> Please do check frame size <div class="unit-wrap"><span class="active">mm</span><span>inch</span></div></div>
+        <div class="dimensions-introuction-head"><strong>Dimension</strong> Please do check frame size <div class="unit-wrap"><span class="active" data-action="mm">mm</span><span data-action="in">inch</span></div></div>
         <p>The ruler in the picture cannot be used to measure your old glasses.<br> Please use your measuring tool to check the size of old pair of glasses.(2-3mm difference acceptable)</p>
     </div>
     <div class="dimensions-ruler">
@@ -20,6 +20,18 @@
         </div>
     </div>
 </div>
+<script> 
+    window.FrameDimension = @Html.Raw(
+       Json.Serialize(new {
+           Model.FrameWidth,
+           Model.FrameHeight,
+           Model.FrameOpposite,
+           Model.FrameTotalWidth,
+           Model.FrameBridgeDistance,
+           Model.FrameTempleLength
+       })
+     );
+</script>
 <script type="text/javascript" asp-location="Footer">
     function resizeCanvas() {
         $('#dimension-item-one').css({
@@ -37,7 +49,7 @@
         var $container = $(container)
         var canvas = $container.parent().find('canvas')[0];
         if (!canvas || !canvas.getContext){
-            console.log('Don\'t support canvus');
+            console.log('Don\'t support canvas');
             return;
         }
         var context = canvas.getContext("2d");
@@ -74,50 +86,59 @@
             context.save();
         });
     }
-    
-    $(document).ready(function () {
-        resizeCanvas();
-        $(window).on('resize', resizeCanvas);
+    function showDimension(unit) {
+        var dimensionData =  window.FrameDimension;
         var dimensionData = {
-            templeLength: { "mm": "143 mm", "in": "5.63 in" },
-            totalWidth: { "mm": "130 mm", "in": "5.12 in" },
-            lensWidth: { "mm": "52 mm", "in": "2.05 in" },
-            lensHeight: { "mm": "44 mm", "in": "1.74 in" },
-            opposite: { "mm": "53 mm", "in": "2.05 in" },
-            bridgeDistance: { "mm": "18 mm", "in": "0.71 in" }
+            templeLength: { "mm":dimensionData.FrameTempleLength + " mm", "in": (dimensionData.FrameTempleLength/25.4).toFixed(2) + " in" },
+            totalWidth: { "mm": dimensionData.FrameTotalWidth + " mm", "in": (dimensionData.FrameTotalWidth/25.4).toFixed(2) + " in" },
+            lensWidth: { "mm": dimensionData.FrameWidth + " mm", "in": (dimensionData.FrameWidth/25.4).toFixed(2) + " in" },
+            lensHeight: { "mm": dimensionData.FrameHeight + " mm", "in": (dimensionData.FrameHeight/25.4).toFixed(2) +" in" },
+            opposite: { "mm": dimensionData.FrameOpposite + " mm", "in": (dimensionData.FrameOpposite/25.4).toFixed(2) +" in" },
+            bridgeDistance: { "mm": dimensionData.FrameBridgeDistance+ " mm", "in": (dimensionData.FrameBridgeDistance/25.4).toFixed(2) +" in" }
         };
         var $itemImageOne = $('#dimension-item-one-image');
         var $itemImageTwo = $('#dimension-item-two-image');
         var dataPoints = [
             {
-                text: dimensionData.totalWidth['mm'],
+                text: dimensionData.totalWidth[unit],
                 position: {x:200, y:10 },
                 rotateAngle: 0
             },
             {
-                text: dimensionData.lensWidth['mm'],
+                text: dimensionData.lensWidth[unit],
                 position: {x:60, y:80 },
                 rotateAngle: 0
             },
             {
-                text: dimensionData.lensHeight['mm'],
+                text: dimensionData.lensHeight[unit],
                 position: {x:335, y:100 },
                 rotateAngle: 0
             },
             {
-                text: dimensionData.bridgeDistance['mm'],
+                text: dimensionData.bridgeDistance[unit],
                 position: {x:190, y:120 },
                 rotateAngle: 0
             },
             {
-                text: dimensionData.opposite['mm'],
+                text: dimensionData.opposite[unit],
                 position: {x:-10, y:150 },
                 rotateAngle: -30
             }
         ]
         drawText(dataPoints, $itemImageOne);
-        drawText([{text: dimensionData.templeLength['mm'], position: {x:190, y: 150}}], $itemImageTwo);
-
+        drawText([{text: dimensionData.templeLength[unit], position: {x:190, y: 150}}], $itemImageTwo);
+    }
+    $(document).ready(function () {
+        resizeCanvas();
+        $(window).on('resize', resizeCanvas);
+        showDimension('mm');
+        $('.unit-wrap').on('click', 'span', function(e) {
+           var $target = $(e.target);
+           var action = $target.data('action');
+           $target.siblings('span').removeClass('active');
+           $target.addClass('active');
+           showDimension(action);
+        });
         $('.gallery').on('click','.product-picture-dimensions', function() {
            $(window).scrollTo($(".product-dimensions"), 500);
         });

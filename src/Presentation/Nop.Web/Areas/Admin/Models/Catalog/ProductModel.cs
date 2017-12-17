@@ -341,6 +341,22 @@ namespace Nop.Web.Areas.Admin.Models.Catalog
         [NopResourceDisplayName("Admin.Catalog.Products.Fields.Height")]
         public decimal Height { get; set; }
 
+        // UPDATED BY TIANYINGCHUN START
+        [NopResourceDisplayName("Admin.Catalog.Products.Fields.FrameWidth")]
+        public decimal FrameWidth { get; set; }
+        [NopResourceDisplayName("Admin.Catalog.Products.Fields.FrameHeight")]
+        public decimal FrameHeight { get; set; }
+        [NopResourceDisplayName("Admin.Catalog.Products.Fields.FrameOpposite")]
+        public decimal FrameOpposite { get; set; }
+        [NopResourceDisplayName("Admin.Catalog.Products.Fields.FrameTotalWidth")]
+        public decimal FrameTotalWidth {get; set; }
+        [NopResourceDisplayName("Admin.Catalog.Products.Fields.FrameBridgeDistance")]
+        public decimal FrameBridgeDistance {get; set; }
+        [NopResourceDisplayName("Admin.Catalog.Products.Fields.FrameTempleLength")]
+        public decimal FrameTempleLength {get; set; }
+        
+        // UPDATED BY TIANYINGCHUN END
+
         [NopResourceDisplayName("Admin.Catalog.Products.Fields.AvailableStartDateTime")]
         [UIHint("DateTimeNullable")]
         public DateTime? AvailableStartDateTimeUtc { get; set; }

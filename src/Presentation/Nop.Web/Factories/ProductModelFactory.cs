@@ -1175,6 +1175,14 @@ namespace Nop.Web.Factories
             {
                 Id = product.Id,
                 Name = product.GetLocalized(x => x.Name),
+
+                FrameWidth = product.FrameWidth,
+                FrameHeight = product.FrameHeight,
+                FrameOpposite = product.FrameOpposite,
+                FrameBridgeDistance = product.FrameBridgeDistance,
+                FrameTotalWidth = product.FrameTotalWidth,
+                FrameTempleLength = product.FrameTempleLength,
+                
                 ShortDescription = product.GetLocalized(x => x.ShortDescription),
                 FullDescription = product.GetLocalized(x => x.FullDescription),
                 MetaKeywords = product.GetLocalized(x => x.MetaKeywords),

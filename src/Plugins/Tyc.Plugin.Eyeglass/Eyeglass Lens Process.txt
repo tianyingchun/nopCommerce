@@ -20,6 +20,7 @@ sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Plugins\Tyc.Plugin.Eyeg
 sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Plugins\Tyc.Plugin.Eyeglass\Themes D:\2_Works\Eyeglasses\build\Plugins\Tyc.Eyeglass\Themes
 sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Plugins\Tyc.Plugin.Eyeglass\Content D:\2_Works\Eyeglasses\build\Plugins\Tyc.Eyeglass\Content
 sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Presentation\Nop.Web\Themes D:\2_Works\Eyeglasses\build\Themes
+sync-files --watch D:\2_Works\Eyeglasses\nopCommerce\src\Presentation\Nop.Web\Areas\Admin\Views D:\2_Works\Eyeglasses\build\Areas\Admin\Views
 
 
 D:\2_Works\Eyeglasses\nopCommerce\src\Presentation\Nop.Web\Themes

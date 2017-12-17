@@ -106,6 +106,41 @@ namespace Nop.Web.Models.Catalog
 
         public string CurrentStoreName { get; set; }
 
+        /// UPDATED BY TIANYINGCHUN START
+
+        /// <summary>
+        /// Gets or sets the glass frame oneSide width
+        /// </summary>
+        public decimal FrameWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the glass frame oneSide height
+        /// </summary>
+        public decimal FrameHeight { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the glass frame opposite 
+        /// </summary>
+        public decimal FrameOpposite { get; set; }
+
+        /// <summary>
+        /// Gets or sets the glass frame total width
+        /// </summary>
+        public decimal FrameTotalWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the glass frame bridge distane 
+        /// </summary>
+        public decimal FrameBridgeDistance { get; set; }
+
+        /// <summary>
+        /// Gets or sets the glass frame Temple Length
+        /// </summary>
+        public decimal FrameTempleLength { get; set; }
+
+        /// UPDATED BY TIANYINGCHUN END
+
         #region Nested Classes
 
         public partial class ProductBreadcrumbModel : BaseNopModel

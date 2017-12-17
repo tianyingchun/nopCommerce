@@ -2802,6 +2802,50 @@
   <LocaleResource Name="Admin.Catalog.Products.Fields.Height.Hint">
     <Value>The product height.</Value>
   </LocaleResource>
+
+  <!-- UPDATED BY TIANYINGCHUN START -->
+  <LocaleResource Name="Admin.Catalog.Products.Frame">
+    <Value>Glass Frame</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameWidth">
+    <Value>FrameWidth</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameWidth.Hint">
+    <Value>The product frame width.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameHeight">
+    <Value>Frame Height</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameHeight.Hint">
+    <Value>The product frame height.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameOpposite">
+    <Value>Frame Opposite</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameOpposite.Hint">
+    <Value>The product Frame Opposite.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameTotalWidth">
+    <Value>Frame TotalWidth</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameTotalWidth.Hint">
+    <Value>The product Frame TotalWidth.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameBridgeDistance">
+    <Value>Frame Bridge Distance</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameBridgeDistance.Hint">
+    <Value>The product Frame Bridge Distance.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameTempleLength">
+    <Value>Frame Temple Length</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Catalog.Products.Fields.FrameTempleLength.Hint">
+    <Value>The product Frame Temple Length.</Value>
+  </LocaleResource>
+  
+  <!-- UPDATED BY TIANYINGCHUN END -->
+
   <LocaleResource Name="Admin.Catalog.Products.Fields.ID">
     <Value>ID</Value>
   </LocaleResource>
