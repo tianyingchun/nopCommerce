@@ -4,9 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using Tyc.Plugin.Eyeglass.Data.Mapping;
+using Tyc.Plugin.Eyeglass.Data.Mapping.Lenses;
+using Tyc.Plugin.Eyeglass.Data.Mapping.Prescription;
+using Tyc.Plugin.Eyeglass.Data.Mapping.Tryon;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
 using Tyc.Plugin.Eyeglass.Domain.Prescription;
+using Tyc.Plugin.Eyeglass.Domain.Tryon;
 
 namespace Tyc.Plugin.Eyeglass.Data
 {
@@ -30,7 +33,7 @@ namespace Tyc.Plugin.Eyeglass.Data
             modelBuilder.Configurations.Add(new GlassLensesMap());
             modelBuilder.Configurations.Add(new GlassLensesAttributeMap());
             modelBuilder.Configurations.Add(new GlassLensesAttributeOptionMap());
-
+            modelBuilder.Configurations.Add(new GlassTryonMap());
 
             //disable EdmMetadata generation
             //modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
@@ -72,6 +75,7 @@ namespace Tyc.Plugin.Eyeglass.Data
             var tableLensesName = this.GetTableName<GlassLenses>();
             var tableLensesAttributeName = this.GetTableName<GlassLensesAttribute>();
             var tableLensesAttributeOptionName = this.GetTableName<GlassLensesAttributeOption>();
+            var tableGlassTryonName = this.GetTableName<GlassTryon>();
 
             //this.DropPluginTable(tableName);
 
@@ -80,6 +84,7 @@ namespace Tyc.Plugin.Eyeglass.Data
             base.Database.ExecuteSqlCommand($"sp_rename {tableLensesName}, '{tableLensesName}_" + str + "'", new object[0]);
             base.Database.ExecuteSqlCommand($"sp_rename {tableLensesAttributeName}, '{tableLensesAttributeName}_" + str + "'", new object[0]);
             base.Database.ExecuteSqlCommand($"sp_rename {tableLensesAttributeOptionName}, '{tableLensesAttributeOptionName}_" + str + "'", new object[0]);
+            base.Database.ExecuteSqlCommand($"sp_rename {tableGlassTryonName}, '{tableGlassTryonName}_" + str + "'", new object[0]);
 
             this.SaveChanges();
         }

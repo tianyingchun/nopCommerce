@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Tyc.Plugin.Eyeglass.Domain;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
 
-namespace Tyc.Plugin.Eyeglass.Data.Mapping
+namespace Tyc.Plugin.Eyeglass.Data.Mapping.Lenses
 {
     class GlassLensesMap : NopEntityTypeConfiguration<GlassLenses>
     {

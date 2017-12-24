@@ -10,9 +10,11 @@ using Nop.Web.Framework.Infrastructure;
 using Tyc.Plugin.Eyeglass.Data;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
 using Tyc.Plugin.Eyeglass.Domain.Prescription;
+using Tyc.Plugin.Eyeglass.Domain.Tryon;
 using Tyc.Plugin.Eyeglass.Services.Checkout;
 using Tyc.Plugin.Eyeglass.Services.Lenses;
 using Tyc.Plugin.Eyeglass.Services.Prescription;
+using Tyc.Plugin.Eyeglass.Services.Tryon;
 
 namespace Tyc.Plugin.Eyeglass.Infrastructure
 {
@@ -26,6 +28,7 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure
             builder.RegisterType<LensPriceCalculationService>().As<IPriceCalculationService>().InstancePerLifetimeScope();
             builder.RegisterType<PrescriptionService>().As<IPrescriptionService>().InstancePerLifetimeScope();
             builder.RegisterType<LensesCheckoutService>().As<ILensesCheckoutService>().InstancePerLifetimeScope();
+            builder.RegisterType<TryonService>().As<ITryonService>().InstancePerLifetimeScope();
 
 
             //data context
@@ -59,6 +62,13 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure
                 .As<IRepository<GlassPrescription>>()
                 .WithParameter(ResolvedParameter.ForNamed<IDbContext>(CONTEXT_NAME))
                 .InstancePerLifetimeScope();
+
+            //Table (GlassTryon)
+            //override required repository with our custom context 
+            builder.RegisterType<EfRepository<GlassTryon>>()
+                    .As<IRepository<GlassTryon>>()
+                    .WithParameter(ResolvedParameter.ForNamed<IDbContext>(CONTEXT_NAME))
+                    .InstancePerLifetimeScope();
         }
         public int Order => 100;
 

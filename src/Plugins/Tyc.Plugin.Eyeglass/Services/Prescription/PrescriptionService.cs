@@ -55,7 +55,7 @@ namespace Tyc.Plugin.Eyeglass.Services.Prescription
         {
 
             var query = from p in _glassPrescriptionRepository.Table
-                        orderby p.CreatedOnUtc, p.CreatedOnUtc, p.Id
+                        orderby p.UpdatedOnUtc, p.CreatedOnUtc, p.Id
                         select p;
 
             return query.ToList();
@@ -99,6 +99,7 @@ namespace Tyc.Plugin.Eyeglass.Services.Prescription
             //event notification
             _eventPublisher.EntityInserted(prescription);
         }
+
 
         public void UpdatePrescription(GlassPrescription prescription)
         {

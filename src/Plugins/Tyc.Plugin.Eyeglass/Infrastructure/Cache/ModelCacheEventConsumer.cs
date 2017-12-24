@@ -3,6 +3,7 @@ using Nop.Core.Events;
 using Nop.Services.Events;
 using Tyc.Plugin.Eyeglass.Domain.Lenses;
 using Tyc.Plugin.Eyeglass.Domain.Prescription;
+using Tyc.Plugin.Eyeglass.Domain.Tryon;
 
 namespace Tyc.Plugin.Eyeglass.Infrastructure.Cache
 {
@@ -21,9 +22,12 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure.Cache
 
         IConsumer<EntityInserted<GlassLensesAttribute>>,
         IConsumer<EntityUpdated<GlassLensesAttribute>>,
-        IConsumer<EntityDeleted<GlassLensesAttribute>>
+        IConsumer<EntityDeleted<GlassLensesAttribute>>,
+
+        IConsumer<EntityDeleted<GlassTryon>>
+
     {
-   
+
         // For GlassLenses Table cache
         public const string GLASSLENSES_BY_ID_KEY = "tyc.plugins.eyeglass.glasslenses-{0}";
         public const string GLASSLENSES_LIST_KEY = "tyc.plugins.eyeglass.glasslenses.list";
@@ -38,7 +42,13 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure.Cache
         public const string GLASSLENSESATTRIBUTEBY_ID_KEY = "tyc.plugins.eyeglass.glasslensesattribute-{0}";
         public const string GLASSLENSESATTRIBUTEBY_GLASSLENSES_ID_KEY = "tyc.plugins.eyeglass.glasslensesattribute.glasslenses-{0}";
         public const string GLASSLENSESATTRIBUTE_PATTERN_KEY = "tyc.plugins.eyeglass.glasslensesattribute";
-        
+
+        // For GlassTryon table cache
+        public const string GLASSTRYON_PATTERN_KEY = "tyc.plugins.eyeglass.glasstryon";
+        public const string GLASSTRYON_BY_ID_KEY = "tyc.plugins.eyeglass.glasstryon-{0}";
+        public const string GLASSTRYON_BY_CUSTOMERID_KEY = "tyc.plugins.eyeglass.glasstryon.customerid-{0}";
+
+
         private readonly IStaticCacheManager _cacheManager;
 
         public ModelCacheEventConsumer(IStaticCacheManager cacheManager)
@@ -74,6 +84,7 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure.Cache
             _cacheManager.RemoveByPattern(GLASSPRESCRIPTION_PATTERN_KEY);
         }
 
+
         public void HandleEvent(EntityInserted<GlassLensesAttribute> eventMessage)
         {
             _cacheManager.RemoveByPattern(GLASSLENSESATTRIBUTE_PATTERN_KEY);
@@ -88,6 +99,20 @@ namespace Tyc.Plugin.Eyeglass.Infrastructure.Cache
         {
             _cacheManager.RemoveByPattern(GLASSLENSESATTRIBUTE_PATTERN_KEY);
             _cacheManager.RemoveByPattern(GLASSLENSES_PATTERN_KEY);
+        }
+
+
+        public void HandleEvent(EntityInserted<GlassTryon> eventMessage)
+        {
+            _cacheManager.RemoveByPattern(GLASSTRYON_PATTERN_KEY);
+        }
+        public void HandleEvent(EntityUpdated<GlassTryon> eventMessage)
+        {
+            _cacheManager.RemoveByPattern(GLASSTRYON_PATTERN_KEY);
+        }
+        public void HandleEvent(EntityDeleted<GlassTryon> eventMessage)
+        {
+            _cacheManager.RemoveByPattern(GLASSTRYON_PATTERN_KEY);
         }
     }
 }
